@@ -69,8 +69,10 @@ RUN mkdir -p /home/www-data \
 # Set HOME environment variable for www-data
 ENV HOME=/home/www-data
 
-# Create directories and set ownership BEFORE installing composer
-RUN mkdir -p /var/www/html/storage \
+# Create Craft runtime directories and set ownership BEFORE installing composer
+RUN mkdir -p /var/www/html/storage/runtime \
+    /var/www/html/storage/logs \
+    /var/www/html/storage/backups \
     /var/www/html/vendor \
     /var/www/html/web/cpresources \
     && chown -R www-data:www-data \
