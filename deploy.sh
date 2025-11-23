@@ -86,16 +86,16 @@ info "Pulling latest code from git..."
 git pull origin main
 
 info "Installing Composer dependencies (production mode)..."
-docker compose exec -T php composer install --no-dev --optimize-autoloader --no-interaction
+docker compose exec -T --user www-data php composer install --no-dev --optimize-autoloader --no-interaction
 
 info "Running Craft migrations..."
-docker compose exec -T php ./craft migrate/all --interactive=0 || echo "No migrations to run"
+docker compose exec -T --user www-data php ./craft migrate/all --interactive=0 || echo "No migrations to run"
 
 info "Applying project config..."
-docker compose exec -T php ./craft project-config/apply --force || echo "No project config changes"
+docker compose exec -T --user www-data php ./craft project-config/apply --force || echo "No project config changes"
 
 info "Clearing Craft caches..."
-docker compose exec -T php ./craft clear-caches/all
+docker compose exec -T --user www-data php ./craft clear-caches/all
 
 info "Restarting PHP-FPM..."
 docker compose restart php

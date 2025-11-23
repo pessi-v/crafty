@@ -59,12 +59,19 @@ RUN cp "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini" \
 # Copy application files
 COPY . /var/www/html
 
-# Configure git safe directory (fixes dubious ownership warning)
-RUN git config --global --add safe.directory /var/www/html
+# Configure git safe directory for both root and www-data user
+RUN git config --global --add safe.directory /var/www/html \
+    && su www-data -s /bin/sh -c "git config --global --add safe.directory /var/www/html"
 
-# Set permissions
-RUN chown -R www-data:www-data /var/www/html/storage \
-    && chmod -R 775 /var/www/html/storage
+# Set proper ownership for directories that need write access
+RUN chown -R www-data:www-data \
+    /var/www/html/storage \
+    /var/www/html/vendor \
+    /var/www/html/web/cpresources \
+    && chmod -R 775 \
+    /var/www/html/storage \
+    /var/www/html/vendor \
+    /var/www/html/web/cpresources
 
 # Expose port 9000 for PHP-FPM
 EXPOSE 9000
