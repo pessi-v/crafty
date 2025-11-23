@@ -59,6 +59,9 @@ RUN cp "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini" \
 # Copy application files
 COPY . /var/www/html
 
+# Configure git safe directory (fixes dubious ownership warning)
+RUN git config --global --add safe.directory /var/www/html
+
 # Set permissions
 RUN chown -R www-data:www-data /var/www/html/storage \
     && chmod -R 775 /var/www/html/storage
