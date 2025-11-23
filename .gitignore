@@ -2,3 +2,14 @@
 /.idea
 /vendor
 .DS_Store
+
+# Backups
+*.sql
+*.sql.gz
+backups/
+backup-*
+
+# Storage (logs, cache, etc - may contain sensitive data)
+/storage/logs/*
+/storage/runtime/*
+DEPLOYMENT.md

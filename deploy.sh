@@ -1,0 +1,115 @@
+#!/bin/bash
+
+# Craft CMS Deployment Script
+# Usage: ./deploy.sh
+
+set -e  # Exit on error
+
+# Load environment variables from .env
+if [ -f .env ]; then
+    export $(grep -v '^#' .env | grep -E '^DEPLOY_' | xargs)
+fi
+
+# Configuration (with .env fallbacks)
+DEPLOY_SERVER="${DEPLOY_SERVER:-homeserver}"
+DEPLOY_USER="${DEPLOY_USER:-root}"
+DEPLOY_PATH="${DEPLOY_PATH:-/opt/crafty}"
+DEPLOY_DOMAIN="${DEPLOY_DOMAIN:-example.com}"
+
+# Allow environment variable overrides
+SERVER="${1:-$DEPLOY_SERVER}"
+REMOTE_USER="${REMOTE_USER:-$DEPLOY_USER}"
+REMOTE_PATH="${REMOTE_PATH:-$DEPLOY_PATH}"
+DOMAIN="${DOMAIN:-$DEPLOY_DOMAIN}"
+LOCAL_PATH="$(pwd)"
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
+
+# Helper functions
+info() {
+    echo -e "${GREEN}[INFO]${NC} $1"
+}
+
+warn() {
+    echo -e "${YELLOW}[WARN]${NC} $1"
+}
+
+error() {
+    echo -e "${RED}[ERROR]${NC} $1"
+    exit 1
+}
+
+# Check if we're in the project root
+if [ ! -f "composer.json" ] || [ ! -f "craft" ]; then
+    error "This script must be run from the project root directory"
+fi
+
+# Check if git working directory is clean
+if [ -n "$(git status --porcelain)" ]; then
+    warn "Git working directory is not clean. Uncommitted changes will not be deployed."
+    read -p "Continue anyway? (y/N) " -n 1 -r
+    echo
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+        error "Deployment cancelled"
+    fi
+fi
+
+info "Starting deployment to ${SERVER}..."
+
+# Step 1: Push to git (assuming remote is already configured)
+info "Pushing latest changes to git..."
+git push origin main || warn "Git push failed or already up to date"
+
+# Step 2: SSH to server and deploy
+info "Connecting to ${SERVER} and deploying..."
+
+ssh "${REMOTE_USER}@${SERVER}" << 'ENDSSH'
+set -e
+
+# Colors for output (redefined for remote session)
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m'
+
+info() {
+    echo -e "${GREEN}[REMOTE]${NC} $1"
+}
+
+# Navigate to project directory
+cd '"${REMOTE_PATH}"' || exit 1
+
+info "Pulling latest code from git..."
+git pull origin main
+
+info "Installing Composer dependencies (production mode)..."
+docker compose exec -T php composer install --no-dev --optimize-autoloader --no-interaction
+
+info "Running Craft migrations..."
+docker compose exec -T php ./craft migrate/all --interactive=0 || echo "No migrations to run"
+
+info "Applying project config..."
+docker compose exec -T php ./craft project-config/apply --force || echo "No project config changes"
+
+info "Clearing Craft caches..."
+docker compose exec -T php ./craft clear-caches/all
+
+info "Restarting PHP-FPM..."
+docker compose restart php
+
+info "Restarting Nginx..."
+docker compose restart nginx
+
+info "Deployment complete!"
+ENDSSH
+
+# Check if deployment was successful
+if [ $? -eq 0 ]; then
+    info "✓ Deployment to ${SERVER} completed successfully!"
+    info "Site should be accessible at: https://${DOMAIN}"
+else
+    error "✗ Deployment failed. Check the output above for errors."
+fi

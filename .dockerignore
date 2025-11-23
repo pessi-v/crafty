@@ -1,0 +1,62 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# DDEV
+.ddev
+
+# IDE and Editor files
+.idea
+.vscode
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Composer
+vendor/*/tests
+vendor/*/test
+vendor/*/Tests
+vendor/*/Test
+
+# Node modules (if you add frontend build)
+node_modules
+npm-debug.log
+yarn-error.log
+
+# Environment files
+.env.example.dev
+.env.example.staging
+
+# Documentation
+README.md
+CHANGELOG.md
+docs/
+
+# CI/CD
+.github
+.gitlab-ci.yml
+
+# Testing
+tests/
+phpunit.xml
+.phpunit.result.cache
+
+# Build artifacts
+dist/
+build/
+
+# Logs
+*.log
+storage/logs/*
+
+# Temporary files
+tmp/
+temp/
+
+# Backup files
+*.sql
+*.sql.gz
+*.zip
+backup-*

@@ -1,0 +1,61 @@
+services:
+  # Nginx web server
+  nginx:
+    image: nginx:alpine
+    container_name: crafty_nginx
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    volumes:
+      - ./web:/var/www/html/web:ro
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./storage/cpresources:/var/www/html/web/cpresources:ro
+    depends_on:
+      - php
+    networks:
+      - crafty
+
+  # PHP-FPM
+  php:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: crafty_php
+    restart: unless-stopped
+    volumes:
+      - .:/var/www/html
+      - ./storage:/var/www/html/storage
+    environment:
+      # Craft will read from .env file
+      - PHP_MEMORY_LIMIT=512M
+      - PHP_MAX_EXECUTION_TIME=300
+    depends_on:
+      - db
+    networks:
+      - crafty
+
+  # MySQL Database
+  db:
+    image: mysql:8.4
+    container_name: crafty_db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${CRAFT_DB_PASSWORD}
+      MYSQL_DATABASE: ${CRAFT_DB_DATABASE}
+      MYSQL_USER: ${CRAFT_DB_USER}
+      MYSQL_PASSWORD: ${CRAFT_DB_PASSWORD}
+    volumes:
+      - db_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    networks:
+      - crafty
+    command: --default-authentication-plugin=mysql_native_password
+
+networks:
+  crafty:
+    driver: bridge
+
+volumes:
+  db_data:
+    driver: local
