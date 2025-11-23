@@ -65,11 +65,15 @@ RUN composer install --no-dev --optimize-autoloader --no-interaction --no-script
 # Copy application files
 COPY . /var/www/html
 
-# Create home directory for www-data user and configure git
-RUN mkdir -p /var/www/.config/git \
-    && chown -R www-data:www-data /var/www/.config \
+# Create writable home directory for www-data and configure git
+RUN mkdir -p /home/www-data \
+    && chown -R www-data:www-data /home/www-data \
+    && usermod -d /home/www-data www-data \
     && git config --global --add safe.directory /var/www/html \
     && su www-data -s /bin/sh -c "git config --global --add safe.directory /var/www/html"
+
+# Set HOME environment variable for www-data
+ENV HOME=/home/www-data
 
 # Set proper ownership for directories that need write access
 RUN chown -R www-data:www-data \
