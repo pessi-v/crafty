@@ -23,8 +23,8 @@ services:
     container_name: crafty_php
     restart: unless-stopped
     volumes:
-      # Mount only specific config files, not the entire directory
-      - ./.env:/var/www/html/.env:ro
+      # Mount .env as writable (Craft needs to update it during install)
+      - ./.env:/var/www/html/.env
       # Use a named volume for storage to persist uploads/data
       - storage_data:/var/www/html/storage
     environment:
