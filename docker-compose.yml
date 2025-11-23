@@ -23,8 +23,10 @@ services:
     container_name: crafty_php
     restart: unless-stopped
     volumes:
-      - .:/var/www/html
-      - ./storage:/var/www/html/storage
+      # Mount only specific config files, not the entire directory
+      - ./.env:/var/www/html/.env:ro
+      # Use a named volume for storage to persist uploads/data
+      - storage_data:/var/www/html/storage
     environment:
       # Craft will read from .env file
       - PHP_MEMORY_LIMIT=512M
@@ -58,4 +60,6 @@ networks:
 
 volumes:
   db_data:
+    driver: local
+  storage_data:
     driver: local
