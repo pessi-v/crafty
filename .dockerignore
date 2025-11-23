@@ -14,11 +14,8 @@
 *~
 .DS_Store
 
-# Composer
-vendor/*/tests
-vendor/*/test
-vendor/*/Tests
-vendor/*/Test
+# Composer - exclude vendor directory entirely (built in Docker)
+vendor/
 
 # Node modules (if you add frontend build)
 node_modules

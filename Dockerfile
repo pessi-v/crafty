@@ -56,13 +56,7 @@ RUN cp "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini" \
     && echo "opcache.max_accelerated_files=10000" >> "$PHP_INI_DIR/conf.d/opcache.ini" \
     && echo "opcache.validate_timestamps=0" >> "$PHP_INI_DIR/conf.d/opcache.ini"
 
-# Copy composer files first for better caching
-COPY composer.json composer.lock ./
-
-# Install PHP dependencies (cached unless composer files change)
-RUN composer install --no-dev --optimize-autoloader --no-interaction --no-scripts
-
-# Copy application files
+# Copy application files (excluding vendor - see .dockerignore)
 COPY . /var/www/html
 
 # Create writable home directory for www-data and configure git
@@ -75,8 +69,11 @@ RUN mkdir -p /home/www-data \
 # Set HOME environment variable for www-data
 ENV HOME=/home/www-data
 
-# Set proper ownership for directories that need write access
-RUN chown -R www-data:www-data \
+# Create directories and set ownership BEFORE installing composer
+RUN mkdir -p /var/www/html/storage \
+    /var/www/html/vendor \
+    /var/www/html/web/cpresources \
+    && chown -R www-data:www-data \
     /var/www/html/storage \
     /var/www/html/vendor \
     /var/www/html/web/cpresources \
@@ -84,6 +81,9 @@ RUN chown -R www-data:www-data \
     /var/www/html/storage \
     /var/www/html/vendor \
     /var/www/html/web/cpresources
+
+# Install composer dependencies as www-data user
+RUN su www-data -s /bin/sh -c "composer install --no-dev --optimize-autoloader --no-interaction"
 
 # Expose port 9000 for PHP-FPM
 EXPOSE 9000
