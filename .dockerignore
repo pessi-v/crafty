@@ -44,9 +44,12 @@ phpunit.xml
 dist/
 build/
 
-# Logs
+# Storage - exclude runtime files (created in Docker with proper permissions)
+storage/runtime/
+storage/logs/
+storage/backups/
+storage/composer-backups/
 *.log
-storage/logs/*
 
 # Temporary files
 tmp/
