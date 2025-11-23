@@ -78,14 +78,17 @@ RUN mkdir -p /var/www/html/storage/runtime \
     /var/www/html/storage/backups \
     /var/www/html/vendor \
     /var/www/html/web/cpresources \
+    /var/www/html/config/project \
     && chown -R www-data:www-data \
     /var/www/html/storage \
     /var/www/html/vendor \
     /var/www/html/web/cpresources \
+    /var/www/html/config \
     && chmod -R 775 \
     /var/www/html/storage \
     /var/www/html/vendor \
-    /var/www/html/web/cpresources
+    /var/www/html/web/cpresources \
+    /var/www/html/config
 
 # Install composer dependencies as www-data user
 RUN su www-data -s /bin/sh -c "composer install --no-dev --optimize-autoloader --no-interaction"
@@ -95,10 +98,12 @@ RUN chown -R www-data:www-data \
     /var/www/html/storage \
     /var/www/html/vendor \
     /var/www/html/web/cpresources \
+    /var/www/html/config \
     && chmod -R 775 \
     /var/www/html/storage \
     /var/www/html/vendor \
-    /var/www/html/web/cpresources
+    /var/www/html/web/cpresources \
+    /var/www/html/config
 
 # Expose port 9000 for PHP-FPM
 EXPOSE 9000
