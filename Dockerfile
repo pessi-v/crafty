@@ -56,11 +56,19 @@ RUN cp "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini" \
     && echo "opcache.max_accelerated_files=10000" >> "$PHP_INI_DIR/conf.d/opcache.ini" \
     && echo "opcache.validate_timestamps=0" >> "$PHP_INI_DIR/conf.d/opcache.ini"
 
+# Copy composer files first for better caching
+COPY composer.json composer.lock ./
+
+# Install PHP dependencies (cached unless composer files change)
+RUN composer install --no-dev --optimize-autoloader --no-interaction --no-scripts
+
 # Copy application files
 COPY . /var/www/html
 
-# Configure git safe directory for both root and www-data user
-RUN git config --global --add safe.directory /var/www/html \
+# Create home directory for www-data user and configure git
+RUN mkdir -p /var/www/.config/git \
+    && chown -R www-data:www-data /var/www/.config \
+    && git config --global --add safe.directory /var/www/html \
     && su www-data -s /bin/sh -c "git config --global --add safe.directory /var/www/html"
 
 # Set proper ownership for directories that need write access
