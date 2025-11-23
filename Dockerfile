@@ -59,6 +59,9 @@ RUN cp "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini" \
 # Copy application files (excluding vendor - see .dockerignore)
 COPY . /var/www/html
 
+# Ensure .env is owned by www-data so it can be modified during install
+RUN chown www-data:www-data /var/www/html/.env
+
 # Create writable home directory for www-data and configure git
 RUN mkdir -p /home/www-data \
     && chown -R www-data:www-data /home/www-data \
