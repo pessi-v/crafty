@@ -1,19 +1,18 @@
 name: crafty
 type: craftcms
 docroot: web
-php_version: "8.5"
+php_version: "8.4"
 webserver_type: nginx-fpm
 xdebug_enabled: false
 additional_hostnames: []
 additional_fqdns: []
 database:
-    type: mysql
-    version: "8.4"
+  type: mysql
+  version: "8.4"
 use_dns_when_possible: true
 composer_version: "2"
 web_environment: []
 corepack_enable: false
-
 # Key features of DDEV's config.yaml:
 
 # name: <projectname> # Name of the project, automatically provides
