@@ -59,8 +59,6 @@ RUN cp "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini" \
 # Copy application files (excluding vendor - see .dockerignore)
 COPY . /var/www/html
 
-# Ensure .env is owned by www-data so it can be modified during install
-RUN chown www-data:www-data /var/www/html/.env
 
 # Create writable home directory for www-data and configure git
 RUN mkdir -p /home/www-data \
@@ -73,6 +71,7 @@ RUN mkdir -p /home/www-data \
 ENV HOME=/home/www-data
 
 # Create Craft runtime directories and set ownership BEFORE installing composer
+# Note: With bind mounts, these directories will be on the host filesystem
 RUN mkdir -p /var/www/html/storage/runtime \
     /var/www/html/storage/logs \
     /var/www/html/storage/backups \
@@ -84,11 +83,13 @@ RUN mkdir -p /var/www/html/storage/runtime \
     /var/www/html/vendor \
     /var/www/html/web/cpresources \
     /var/www/html/config \
+    /var/www/html/.env \
     && chmod -R 775 \
     /var/www/html/storage \
     /var/www/html/vendor \
     /var/www/html/web/cpresources \
-    /var/www/html/config
+    /var/www/html/config \
+    && chmod 664 /var/www/html/.env
 
 # Install composer dependencies as www-data user
 RUN su www-data -s /bin/sh -c "composer install --no-dev --optimize-autoloader --no-interaction"
@@ -99,11 +100,13 @@ RUN chown -R www-data:www-data \
     /var/www/html/vendor \
     /var/www/html/web/cpresources \
     /var/www/html/config \
+    /var/www/html/.env \
     && chmod -R 775 \
     /var/www/html/storage \
     /var/www/html/vendor \
     /var/www/html/web/cpresources \
-    /var/www/html/config
+    /var/www/html/config \
+    && chmod 664 /var/www/html/.env
 
 # Expose port 9000 for PHP-FPM
 EXPOSE 9000
