@@ -26,6 +26,7 @@ services:
       - ./storage:/var/www/html/storage
       - ./config:/var/www/html/config
       - ./web/cpresources:/var/www/html/web/cpresources
+      - ./.env:/var/www/html/.env:ro
     environment:
       # Craft will read from .env file
       - PHP_MEMORY_LIMIT=512M

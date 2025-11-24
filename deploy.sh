@@ -67,8 +67,11 @@ git push origin main || warn "Git push failed or already up to date"
 # Step 2: SSH to server and deploy
 info "Connecting to ${SERVER} and deploying..."
 
-ssh "${REMOTE_USER}@${SERVER}" bash -s << ENDSSH
+ssh "${REMOTE_USER}@${SERVER}" "bash -s" -- "${REMOTE_PATH}" << 'ENDSSH'
 set -e
+
+# Get the remote path from the argument
+REMOTE_PATH="$1"
 
 # Colors for output (redefined for remote session)
 GREEN='\033[0;32m'
@@ -76,7 +79,7 @@ YELLOW='\033[1;33m'
 NC='\033[0m'
 
 info() {
-    echo -e "\${GREEN}[REMOTE]\${NC} \$1"
+    echo -e "${GREEN}[REMOTE]${NC} $1"
 }
 
 # Navigate to project directory
