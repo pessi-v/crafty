@@ -1,4 +1,4 @@
-dateModified: 1763995928
+dateModified: 1763998643
 email:
   fromEmail: pessimo@posteo.net
   fromName: crafty
@@ -12,8 +12,9 @@ system:
   edition: solo
   live: true
   name: crafty
+  retryDuration: null
   schemaVersion: 5.8.0.3
-  timeZone: America/Los_Angeles
+  timeZone: Europe/Berlin
 users:
   allowPublicRegistration: false
   defaultGroup: null
