@@ -108,7 +108,16 @@ RUN chown -R www-data:www-data \
     /var/www/html/config \
     && chmod 664 /var/www/html/.env
 
+# Create a simple entrypoint script to fix permissions on startup
+RUN echo '#!/bin/sh' > /docker-entrypoint.sh \
+    && echo 'set -e' >> /docker-entrypoint.sh \
+    && echo 'chown -R www-data:www-data /var/www/html/storage /var/www/html/config /var/www/html/web/cpresources 2>/dev/null || true' >> /docker-entrypoint.sh \
+    && echo 'chmod -R 775 /var/www/html/storage /var/www/html/config /var/www/html/web/cpresources 2>/dev/null || true' >> /docker-entrypoint.sh \
+    && echo 'exec "$@"' >> /docker-entrypoint.sh \
+    && chmod +x /docker-entrypoint.sh
+
 # Expose port 9000 for PHP-FPM
 EXPOSE 9000
 
+ENTRYPOINT ["/docker-entrypoint.sh"]
 CMD ["php-fpm"]
