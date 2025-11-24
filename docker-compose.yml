@@ -22,9 +22,8 @@ services:
     container_name: crafty_php
     restart: unless-stopped
     volumes:
-      # Bind mount storage directory (permissions managed by Dockerfile)
+      # Bind mount writable directories only
       - ./storage:/var/www/html/storage
-      - ./config:/var/www/html/config
       - ./web/cpresources:/var/www/html/web/cpresources
       - ./.env:/var/www/html/.env
     environment:

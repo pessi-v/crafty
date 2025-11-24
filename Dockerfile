@@ -111,9 +111,10 @@ RUN chown -R www-data:www-data \
 # Create a simple entrypoint script to fix permissions on startup
 RUN echo '#!/bin/sh' > /docker-entrypoint.sh \
     && echo 'set -e' >> /docker-entrypoint.sh \
-    && echo 'chown -R www-data:www-data /var/www/html/storage /var/www/html/config /var/www/html/web/cpresources 2>/dev/null || true' >> /docker-entrypoint.sh \
+    && echo '# Only change ownership of writable directories' >> /docker-entrypoint.sh \
+    && echo 'chown -R www-data:www-data /var/www/html/storage /var/www/html/web/cpresources 2>/dev/null || true' >> /docker-entrypoint.sh \
     && echo 'chown www-data:www-data /var/www/html/.env 2>/dev/null || true' >> /docker-entrypoint.sh \
-    && echo 'chmod -R 775 /var/www/html/storage /var/www/html/config /var/www/html/web/cpresources 2>/dev/null || true' >> /docker-entrypoint.sh \
+    && echo 'chmod -R 775 /var/www/html/storage /var/www/html/web/cpresources 2>/dev/null || true' >> /docker-entrypoint.sh \
     && echo 'chmod 664 /var/www/html/.env 2>/dev/null || true' >> /docker-entrypoint.sh \
     && echo 'exec "$@"' >> /docker-entrypoint.sh \
     && chmod +x /docker-entrypoint.sh
