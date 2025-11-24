@@ -83,10 +83,21 @@ info() {
 }
 
 # Navigate to project directory
+info "Navigating to ${REMOTE_PATH}..."
 cd "${REMOTE_PATH}" || exit 1
+info "Current directory: $(pwd)"
+
+info "Checking git status..."
+git status
 
 info "Pulling latest code from git..."
-git pull origin main
+# Use SSH agent socket if available
+if [ -n "$SSH_AUTH_SOCK" ]; then
+    git pull origin main
+else
+    info "SSH agent not available, using local SSH keys..."
+    git pull origin main
+fi
 
 info "Installing Composer dependencies (production mode)..."
 docker compose exec -T --user www-data php composer install --no-dev --optimize-autoloader --no-interaction
