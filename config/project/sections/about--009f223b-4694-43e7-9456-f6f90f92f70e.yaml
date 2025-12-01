@@ -1,0 +1,21 @@
+defaultPlacement: end
+enableVersioning: true
+entryTypes:
+  -
+    uid: d497ff9b-a464-41d9-9984-ba0d369102f9 # About
+handle: about
+maxAuthors: 1
+name: About
+previewTargets:
+  -
+    label: 'Primary entry page'
+    refresh: '1'
+    urlFormat: '{url}'
+propagationMethod: all
+siteSettings:
+  d9505feb-37aa-49c1-a4e1-3ea3bb97a5eb: # crafty
+    enabledByDefault: true
+    hasUrls: true
+    template: _singles/about
+    uriFormat: about
+type: single
