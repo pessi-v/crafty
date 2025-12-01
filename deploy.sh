@@ -67,7 +67,8 @@ git push origin main || warn "Git push failed or already up to date"
 # Step 2: SSH to server and deploy
 info "Connecting to ${SERVER} and deploying..."
 
-ssh "${REMOTE_USER}@${SERVER}" "bash -s" -- "${REMOTE_PATH}" << 'ENDSSH'
+# Use SSH agent forwarding to allow git operations on remote server
+ssh -A "${REMOTE_USER}@${SERVER}" "bash -s" -- "${REMOTE_PATH}" << 'ENDSSH'
 set -e
 
 # Get the remote path from the argument
@@ -91,8 +92,6 @@ info "Checking git status..."
 git status
 
 info "Pulling latest code from git..."
-# Ensure SSH uses the correct keys by setting GIT_SSH_COMMAND
-export GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
 git pull origin main
 
 info "Installing Composer dependencies (production mode)..."
