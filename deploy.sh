@@ -18,9 +18,9 @@ DEPLOY_DOMAIN="${DEPLOY_DOMAIN:-example.com}"
 
 # Allow environment variable overrides
 SERVER="${1:-$DEPLOY_SERVER}"
-REMOTE_USER="${REMOTE_USER:-$DEPLOY_USER}"
-REMOTE_PATH="${REMOTE_PATH:-$DEPLOY_PATH}"
-DOMAIN="${DOMAIN:-$DEPLOY_DOMAIN}"
+REMOTE_USER="${DEPLOY_USER}"
+REMOTE_PATH="${DEPLOY_PATH}"
+DOMAIN="${DEPLOY_DOMAIN}"
 LOCAL_PATH="$(pwd)"
 
 # Colors for output
@@ -91,13 +91,9 @@ info "Checking git status..."
 git status
 
 info "Pulling latest code from git..."
-# Use SSH agent socket if available
-if [ -n "$SSH_AUTH_SOCK" ]; then
-    git pull origin main
-else
-    info "SSH agent not available, using local SSH keys..."
-    git pull origin main
-fi
+# Ensure SSH uses the correct keys by setting GIT_SSH_COMMAND
+export GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
+git pull origin main
 
 info "Installing Composer dependencies (production mode)..."
 docker compose exec -T --user www-data php composer install --no-dev --optimize-autoloader --no-interaction
