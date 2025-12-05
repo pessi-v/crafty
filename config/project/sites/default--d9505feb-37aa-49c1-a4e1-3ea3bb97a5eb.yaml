@@ -1,8 +1,9 @@
 baseUrl: $PRIMARY_SITE_URL
+enabled: true
 handle: default
 hasUrls: true
 language: en
-name: crafty
+name: receitas
 primary: true
 siteGroup: 3e4eb5c2-aa9b-44b1-882c-7432f09816d4 # crafty
 sortOrder: 1

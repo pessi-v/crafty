@@ -13,7 +13,7 @@ previewTargets:
     urlFormat: '{url}'
 propagationMethod: all
 siteSettings:
-  d9505feb-37aa-49c1-a4e1-3ea3bb97a5eb: # crafty
+  d9505feb-37aa-49c1-a4e1-3ea3bb97a5eb: # receitas
     enabledByDefault: true
     hasUrls: true
     template: _singles/about
