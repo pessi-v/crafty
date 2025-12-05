@@ -18,6 +18,10 @@
       }
       canvas {
         display: block;
+        cursor: default;
+      }
+      canvas.pointer {
+        cursor: pointer;
       }
       #info {
         position: absolute;
@@ -158,6 +162,31 @@
           model: null,
         },
       };
+
+      // URL configuration for clickable objects
+      const clickableObjects = {
+        turnip: {
+          url: "https://example.com/planet",
+          name: "Turnip Planet",
+        },
+        chili: {
+          url: "https://example.com/chili",
+          name: "Chili Satellite",
+        },
+        egg: {
+          url: "https://example.com/egg",
+          name: "Egg Satellite",
+        },
+        garlic: {
+          url: "https://example.com/garlic",
+          name: "Garlic Satellite",
+        },
+      };
+
+      // Raycaster for click detection
+      const raycaster = new THREE.Raycaster();
+      const mouse = new THREE.Vector2();
+      let hoveredObject = null;
 
       // GLTF Loader
       const loader = new GLTFLoader();
@@ -342,6 +371,97 @@
 
         renderer.render(scene, camera);
       }
+
+      // Function to get all clickable meshes
+      function getClickableMeshes() {
+        const meshes = [];
+
+        // Add turnip planet meshes
+        if (turnipPlanet) {
+          turnipPlanet.traverse((child) => {
+            if (child.isMesh) {
+              child.userData.clickableType = "turnip";
+              meshes.push(child);
+            }
+          });
+        }
+
+        // Add satellite meshes
+        Object.keys(orbitalData).forEach((key) => {
+          const satellite = orbitalData[key];
+          if (satellite.model) {
+            satellite.model.traverse((child) => {
+              if (child.isMesh) {
+                child.userData.clickableType = key;
+                meshes.push(child);
+              }
+            });
+          }
+        });
+
+        return meshes;
+      }
+
+      // Mouse move handler for hover effects
+      function onMouseMove(event) {
+        // Calculate mouse position in normalized device coordinates
+        mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+        mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+        // Update raycaster
+        raycaster.setFromCamera(mouse, camera);
+        const intersects = raycaster.intersectObjects(
+          getClickableMeshes(),
+          false
+        );
+
+        if (intersects.length > 0) {
+          const intersectedObject = intersects[0].object;
+          if (hoveredObject !== intersectedObject) {
+            hoveredObject = intersectedObject;
+            renderer.domElement.classList.add("pointer");
+          }
+        } else {
+          if (hoveredObject) {
+            hoveredObject = null;
+            renderer.domElement.classList.remove("pointer");
+          }
+        }
+      }
+
+      // Click handler
+      function onClick(event) {
+        // Calculate mouse position
+        mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+        mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+        // Update raycaster
+        raycaster.setFromCamera(mouse, camera);
+        const intersects = raycaster.intersectObjects(
+          getClickableMeshes(),
+          false
+        );
+
+        if (intersects.length > 0) {
+          const clickedObject = intersects[0].object;
+          const objectType = clickedObject.userData.clickableType;
+
+          if (objectType && clickableObjects[objectType]) {
+            const config = clickableObjects[objectType];
+            console.log(`Clicked on ${config.name}`);
+
+            // Navigate to URL
+            window.location.href = config.url;
+
+            // Alternative: Open in new tab
+            // window.open(config.url, '_blank');
+          }
+        }
+      }
+
+      // Add event listeners
+      window.addEventListener("mousemove", onMouseMove, false);
+      window.addEventListener("click", onClick, false);
 
       // Handle window resize
       window.addEventListener("resize", () => {

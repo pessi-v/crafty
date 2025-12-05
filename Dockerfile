@@ -76,10 +76,10 @@ ENV HOME=/home/www-data
 RUN mkdir -p /var/www/html/storage/runtime \
     /var/www/html/storage/logs \
     /var/www/html/storage/backups \
-    /var/www/html/vendor \
     /var/www/html/web/cpresources \
     /var/www/html/web/uploads \
-    /var/www/html/config/project
+    /var/www/html/config/project \
+    && chown -R www-data:www-data /var/www/html
 
 # Install composer dependencies as www-data user
 RUN su www-data -s /bin/sh -c "composer install --no-dev --optimize-autoloader --no-interaction"
