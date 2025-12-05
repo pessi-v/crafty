@@ -34,6 +34,10 @@
 <div id="animation-container">
 </div>
 
+{% do craft.app.view.registerJsFile('@web/animation.js', {
+  type: 'module'
+}) %}
+
 <script type="importmap">
   {
     "imports": {
@@ -44,7 +48,7 @@
 </script>
 
 <script type="module">
-  import { initAnimation } from "{{ siteUrl }}animation.js";
+  import { initAnimation } from '/animation.js';
 
   // Configuration object with Twig variables
   const animationConfig = {
