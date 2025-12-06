@@ -1,0 +1,21 @@
+defaultPlacement: end
+enableVersioning: true
+entryTypes:
+  -
+    uid: 17d277de-e9bd-44e5-b20e-c00f3dfdb89c # Recipe
+handle: recipes
+maxAuthors: 1
+name: Recipes
+previewTargets:
+  -
+    label: 'Primary entry page'
+    refresh: '1'
+    urlFormat: '{url}'
+propagationMethod: all
+siteSettings:
+  d9505feb-37aa-49c1-a4e1-3ea3bb97a5eb: # receitas
+    enabledByDefault: true
+    hasUrls: true
+    template: recipes/_entry.twig
+    uriFormat: 'recipes/{slug}'
+type: channel

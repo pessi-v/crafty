@@ -1,6 +1,57 @@
 {% extends "_layout.twig" %}
 
 {% block content %}
+
+{# Query all recipes for the turnip #}
+{% set allRecipes = craft.entries()
+  .section('recipes')
+  .all() %}
+
+{# Query spicy recipes for the chili #}
+{% set spicyRecipes = craft.entries()
+  .section('recipes')
+  .relatedTo({
+    targetElement: craft.categories().slug('spicy').one()
+  })
+  .all() %}
+
+{# Helper macro to convert recipes to data array #}
+{% macro prepareRecipeData(recipes) %}
+  {% set recipesData = [] %}
+  {% for recipe in recipes %}
+    {# Render Matrix field content #}
+    {% set contentHtml = '' %}
+    {% if recipe.recipeContent|length %}
+      {% for block in recipe.recipeContent.all() %}
+        {% if block.type.handle == 'text' %}
+          {% set contentHtml = contentHtml ~ '<p>' ~ (block.text|nl2br) ~ '</p>' %}
+        {% elseif block.type.handle == 'image' %}
+          {% if block.image|length %}
+            {% for img in block.image.all() %}
+              {% set contentHtml = contentHtml ~ '<img src="' ~ img.url ~ '" alt="' ~ (img.title ?? '') ~ '" style="max-width: 100%; height: auto; margin: 20px 0; border-radius: 10px;">' %}
+            {% endfor %}
+          {% endif %}
+        {% endif %}
+      {% endfor %}
+    {% endif %}
+
+    {% set recipesData = recipesData|merge([{
+      id: recipe.id,
+      title: recipe.title,
+      slug: recipe.slug,
+      categories: recipe.recipeCategories|map(c => {
+        id: c.id,
+        title: c.title
+      }),
+      content: contentHtml
+    }]) %}
+  {% endfor %}
+  {{ recipesData|json_encode|raw }}
+{% endmacro %}
+
+{# Prepare recipe data for JavaScript #}
+{% set recipesData = _self.prepareRecipeData(allRecipes)|json_decode %}
+{% set spicyRecipesData = _self.prepareRecipeData(spicyRecipes)|json_decode %}
 <style>
   body {
     margin: 0;
@@ -40,9 +91,205 @@
     cursor: pointer;
   }
 
+  /* Modal styles */
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(5px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .modal-overlay.active {
+    display: flex;
+    opacity: 1;
+  }
+
+  .modal-content {
+    background: linear-gradient(135deg, #1a1a3a 0%, #2a1a3a 100%);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    max-width: 800px;
+    max-height: 80vh;
+    width: 90%;
+    overflow-y: auto;
+    padding: 40px;
+    position: relative;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    transform: scale(0.9);
+    transition: transform 0.3s ease;
+    color: #ffffff;
+  }
+
+  .modal-overlay.active .modal-content {
+    transform: scale(1);
+  }
+
+  .modal-close {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    font-size: 24px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+  }
+
+  .modal-close:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: rotate(90deg);
+  }
+
+  .modal-title {
+    font-size: 2em;
+    margin: 0 0 20px 0;
+    color: #ffffff;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  }
+
+  .modal-body {
+    line-height: 1.6;
+  }
+
+  .modal-body h1, .modal-body h2, .modal-body h3 {
+    margin-top: 1.5em;
+    margin-bottom: 0.5em;
+    color: #ffffff;
+  }
+
+  .modal-body p {
+    margin-bottom: 1em;
+  }
+
+  .modal-body ul, .modal-body ol {
+    margin-left: 20px;
+    margin-bottom: 1em;
+  }
+
+  .modal-loading {
+    text-align: center;
+    padding: 40px;
+    font-size: 1.2em;
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  /* Custom scrollbar for modal */
+  .modal-content::-webkit-scrollbar {
+    width: 10px;
+  }
+
+  .modal-content::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+  }
+
+  .modal-content::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+  }
+
+  .modal-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+  }
+
+  /* Recipe list styles */
+  .recipe-list {
+    display: grid;
+    gap: 15px;
+    margin-top: 20px;
+  }
+
+  .recipe-list-item {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    padding: 20px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .recipe-list-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+    transform: translateX(5px);
+  }
+
+  .recipe-list-item h3 {
+    margin: 0 0 10px 0;
+    color: #ffffff;
+    font-size: 1.3em;
+  }
+
+  .recipe-categories {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .recipe-category-tag {
+    display: inline-block;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 0.85em;
+    color: rgba(255, 255, 255, 0.8);
+  }
+
+  /* Back button */
+  .modal-back-button {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1em;
+    margin-bottom: 20px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+  }
+
+  .modal-back-button:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateX(-3px);
+  }
+
+  .modal-back-button::before {
+    content: "←";
+    font-size: 1.2em;
+  }
+
 </style>
 
 <div id="animation-container">
+</div>
+
+<!-- Modal -->
+<div id="recipe-modal" class="modal-overlay">
+  <div class="modal-content">
+    <button class="modal-close" onclick="closeModal()">&times;</button>
+    <div id="modal-inner">
+      <div class="modal-loading">Loading...</div>
+    </div>
+  </div>
 </div>
 
 {% do craft.app.view.registerJsFile('@web/animation.js', {
@@ -61,30 +308,167 @@
 <script type="module">
   import { initAnimation } from '/animation.js';
 
+  // All recipes data
+  const allRecipes = {{ recipesData|json_encode|raw }};
+  const spicyRecipes = {{ spicyRecipesData|json_encode|raw }};
+
   // Configuration object with Twig variables
   const animationConfig = {
     baseUrl: "{{ siteUrl }}",
     clickableObjects: {
       turnip: {
-        url: "{{ entry.turnipUrl ?? 'https://example.com/planet' }}",
         name: "Turnip Planet",
+        type: "list",
+        recipes: allRecipes,
+        listTitle: "All Recipes"
       },
       chili: {
-        url: "{{ entry.chiliUrl ?? 'https://example.com/chili' }}",
         name: "Chili Satellite",
+        type: "list",
+        recipes: spicyRecipes,
+        listTitle: "Spicy Recipes"
       },
       egg: {
-        url: "{{ entry.eggUrl ?? 'https://example.com/egg' }}",
         name: "Egg Satellite",
+        type: "list",
+        recipes: [], // Will be filtered recipes
+        listTitle: "Egg Recipes"
       },
       garlic: {
-        url: "{{ entry.garlicUrl ?? 'https://example.com/garlic' }}",
         name: "Garlic Satellite",
+        type: "list",
+        recipes: [], // Will be filtered recipes
+        listTitle: "Garlic Recipes"
       },
     },
   };
 
   // Initialize the animation
   initAnimation(animationConfig);
+</script>
+
+<script>
+  // Store current modal state
+  let currentModalState = null;
+
+  // Modal functions
+  function openModal(config) {
+    const modal = document.getElementById('recipe-modal');
+
+    // Show modal
+    modal.classList.add('active');
+
+    // Store the config for back navigation
+    currentModalState = {
+      config: config,
+      view: 'list'
+    };
+
+    // Display recipe list
+    if (config.type === 'list') {
+      displayRecipeList(config);
+    }
+  }
+
+  function closeModal() {
+    const modal = document.getElementById('recipe-modal');
+    modal.classList.remove('active');
+    currentModalState = null;
+  }
+
+  function displayRecipeList(config) {
+    const modalInner = document.getElementById('modal-inner');
+
+    const recipesHtml = config.recipes.map(recipe => {
+      const categoriesHtml = recipe.categories && recipe.categories.length > 0
+        ? `<div class="recipe-categories">
+            ${recipe.categories.map(cat =>
+              `<span class="recipe-category-tag">${cat.title}</span>`
+            ).join('')}
+          </div>`
+        : '';
+
+      return `
+        <div class="recipe-list-item" onclick="showRecipeDetail(${recipe.id})">
+          <h3>${recipe.title}</h3>
+          ${categoriesHtml}
+        </div>
+      `;
+    }).join('');
+
+    modalInner.innerHTML = `
+      <h1 class="modal-title">${config.listTitle}</h1>
+      <div class="recipe-list">
+        ${recipesHtml.length > 0 ? recipesHtml : '<p>No recipes found</p>'}
+      </div>
+    `;
+
+    // Update modal state
+    currentModalState.view = 'list';
+  }
+
+  function showRecipeDetail(recipeId) {
+    const modalInner = document.getElementById('modal-inner');
+
+    // Find the recipe in the current config
+    const recipe = currentModalState.config.recipes.find(r => r.id == recipeId);
+
+    if (!recipe) {
+      console.error('Recipe not found:', recipeId);
+      return;
+    }
+
+    const categoriesHtml = recipe.categories && recipe.categories.length > 0
+      ? `<div style="margin-bottom: 20px;">
+          ${recipe.categories.map(cat =>
+            `<span style="display: inline-block; background: rgba(255,255,255,0.1); padding: 5px 15px; border-radius: 15px; margin-right: 10px; font-size: 0.9em;">
+              ${cat.title}
+            </span>`
+          ).join('')}
+        </div>`
+      : '';
+
+    modalInner.innerHTML = `
+      <button class="modal-back-button" onclick="backToList()">Back to ${currentModalState.config.listTitle}</button>
+      <h1 class="modal-title">${recipe.title}</h1>
+      ${categoriesHtml}
+      <div class="modal-body">
+        ${recipe.content || '<p>No content available</p>'}
+      </div>
+    `;
+
+    // Scroll to top of modal
+    document.querySelector('.modal-content').scrollTop = 0;
+
+    // Update modal state
+    currentModalState.view = 'detail';
+    currentModalState.currentRecipe = recipe;
+  }
+
+  function backToList() {
+    if (currentModalState && currentModalState.config) {
+      displayRecipeList(currentModalState.config);
+    }
+  }
+
+  // Close modal when clicking outside
+  document.getElementById('recipe-modal').addEventListener('click', function(e) {
+    if (e.target === this) {
+      closeModal();
+    }
+  });
+
+  // Close modal with ESC key
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      closeModal();
+    }
+  });
+
+  // Make functions available globally
+  window.openModal = openModal;
+  window.closeModal = closeModal;
+  window.showRecipeDetail = showRecipeDetail;
+  window.backToList = backToList;
 </script>
 {% endblock %}

@@ -1,4 +1,4 @@
-dateModified: 1765018994
+dateModified: 1765022560
 email:
   fromEmail: pessimo@posteo.net
   fromName: crafty
@@ -18,9 +18,11 @@ meta:
     5cd5bce7-c361-47f8-8133-e355374656a5: Blog # Blog
     8fc2b849-2a9d-4a31-b0c6-b3d0848b1bbb: Radio # Radio
     009f223b-4694-43e7-9456-f6f90f92f70e: About # About
+    17d277de-e9bd-44e5-b20e-c00f3dfdb89c: Recipe # Recipe
     106cc540-d266-414a-855d-0210da8bce77: 'Post Categories' # Post Categories
     501d1bf0-a6b7-4518-9e16-52e7b250d894: Text # Text
     553fa78f-c047-4fcc-a026-fd44d2db2651: Image # Image
+    781e6ef0-6342-4dd2-bf71-29540b8e7870: Recipes # Recipes
     9902f883-4ee4-42b9-b395-d40aa2889539: Post # Post
     25431696-37aa-4439-9032-f14da9ecc28a: Images # Images
     42648855-257f-432d-8b42-88e72ee6c127: 'Site Info' # Site Info

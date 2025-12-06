@@ -383,11 +383,10 @@ export function initAnimation(config) {
         const config = clickableObjects[objectType];
         console.log(`Clicked on ${config.name}`);
 
-        // Navigate to URL
-        window.location.href = config.url;
-
-        // Alternative: Open in new tab
-        // window.open(config.url, '_blank');
+        // Open modal with entry data
+        if (window.openModal) {
+          window.openModal(config);
+        }
       }
     }
   }
