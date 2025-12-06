@@ -305,49 +305,8 @@
   }
 </script>
 
-<script type="module">
-  import { initAnimation } from '/animation.js';
-
-  // All recipes data
-  const allRecipes = {{ recipesData|json_encode|raw }};
-  const spicyRecipes = {{ spicyRecipesData|json_encode|raw }};
-
-  // Configuration object with Twig variables
-  const animationConfig = {
-    baseUrl: "{{ siteUrl }}",
-    clickableObjects: {
-      turnip: {
-        name: "Turnip Planet",
-        type: "list",
-        recipes: allRecipes,
-        listTitle: "All Recipes"
-      },
-      chili: {
-        name: "Chili Satellite",
-        type: "list",
-        recipes: spicyRecipes,
-        listTitle: "Spicy Recipes"
-      },
-      egg: {
-        name: "Egg Satellite",
-        type: "list",
-        recipes: [], // Will be filtered recipes
-        listTitle: "Egg Recipes"
-      },
-      garlic: {
-        name: "Garlic Satellite",
-        type: "list",
-        recipes: [], // Will be filtered recipes
-        listTitle: "Garlic Recipes"
-      },
-    },
-  };
-
-  // Initialize the animation
-  initAnimation(animationConfig);
-</script>
-
 <script>
+  // Modal functions - MUST be defined before animation initializes
   // Store current modal state
   let currentModalState = null;
 
@@ -470,5 +429,47 @@
   window.closeModal = closeModal;
   window.showRecipeDetail = showRecipeDetail;
   window.backToList = backToList;
+</script>
+
+<script type="module">
+  import { initAnimation } from '/animation.js';
+
+  // All recipes data
+  const allRecipes = {{ recipesData|json_encode|raw }};
+  const spicyRecipes = {{ spicyRecipesData|json_encode|raw }};
+
+  // Configuration object with Twig variables
+  const animationConfig = {
+    baseUrl: "{{ siteUrl }}",
+    clickableObjects: {
+      turnip: {
+        name: "Turnip Planet",
+        type: "list",
+        recipes: allRecipes,
+        listTitle: "All Recipes"
+      },
+      chili: {
+        name: "Chili Satellite",
+        type: "list",
+        recipes: spicyRecipes,
+        listTitle: "Spicy Recipes"
+      },
+      egg: {
+        name: "Egg Satellite",
+        type: "list",
+        recipes: [], // Will be filtered recipes
+        listTitle: "Egg Recipes"
+      },
+      garlic: {
+        name: "Garlic Satellite",
+        type: "list",
+        recipes: [], // Will be filtered recipes
+        listTitle: "Garlic Recipes"
+      },
+    },
+  };
+
+  // Initialize the animation
+  initAnimation(animationConfig);
 </script>
 {% endblock %}
