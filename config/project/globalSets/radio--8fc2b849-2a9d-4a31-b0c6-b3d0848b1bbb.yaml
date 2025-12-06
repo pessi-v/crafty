@@ -1,0 +1,22 @@
+fieldLayouts:
+  6cda929a-bd58-40d6-9ea0-870269a398bd:
+    cardThumbAlignment: end
+    tabs:
+      -
+        elementCondition: null
+        elements:
+          -
+            dateAdded: '2025-12-05T23:49:56+00:00'
+            elementCondition: null
+            template: radio.twig
+            templateMode: site
+            type: craft\fieldlayoutelements\Template
+            uid: 61c8abd8-4c36-46f7-bd25-f05614e76c0a
+            userCondition: null
+            width: 100
+        name: Content
+        uid: 5e087813-ed2b-42f9-a842-c3f9748f34b1
+        userCondition: null
+handle: radio
+name: Radio
+sortOrder: 2
