@@ -34,14 +34,19 @@
     {% endfor %}
   {% endif %}
 
+  {% set recipeCategories = [] %}
+  {% for cat in recipe.recipeCategories.all() %}
+    {% set recipeCategories = recipeCategories|merge([{
+      id: cat.id,
+      title: cat.title
+    }]) %}
+  {% endfor %}
+
   {% set recipesData = recipesData|merge([{
     id: recipe.id,
     title: recipe.title,
     slug: recipe.slug,
-    categories: recipe.recipeCategories|map(c => {
-      id: c.id,
-      title: c.title
-    }),
+    categories: recipeCategories,
     content: contentHtml
   }]) %}
 {% endfor %}
@@ -65,14 +70,19 @@
     {% endfor %}
   {% endif %}
 
+  {% set recipeCategories = [] %}
+  {% for cat in recipe.recipeCategories.all() %}
+    {% set recipeCategories = recipeCategories|merge([{
+      id: cat.id,
+      title: cat.title
+    }]) %}
+  {% endfor %}
+
   {% set spicyRecipesData = spicyRecipesData|merge([{
     id: recipe.id,
     title: recipe.title,
     slug: recipe.slug,
-    categories: recipe.recipeCategories|map(c => {
-      id: c.id,
-      title: c.title
-    }),
+    categories: recipeCategories,
     content: contentHtml
   }]) %}
 {% endfor %}
