@@ -382,10 +382,14 @@ export function initAnimation(config) {
       if (objectType && clickableObjects[objectType]) {
         const config = clickableObjects[objectType];
         console.log(`Clicked on ${config.name}`);
+        console.log('Config:', config);
+        console.log('window.openModal available?', typeof window.openModal);
 
         // Open modal with entry data
         if (window.openModal) {
           window.openModal(config);
+        } else {
+          console.error('window.openModal is not defined!');
         }
       }
     }
