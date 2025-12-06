@@ -2,6 +2,7 @@
 
 # Craft CMS Deployment Script
 # Usage: ./deploy.sh
+# Deploys the currently active git branch to the server
 
 set -e  # Exit on error
 
@@ -16,8 +17,9 @@ DEPLOY_USER="${DEPLOY_USER:-root}"
 DEPLOY_PATH="${DEPLOY_PATH:-/opt/crafty}"
 DEPLOY_DOMAIN="${DEPLOY_DOMAIN:-example.com}"
 
-# Allow environment variable overrides
-SERVER="${1:-$DEPLOY_SERVER}"
+# Get current git branch
+BRANCH=$(git rev-parse --abbrev-ref HEAD)
+SERVER="${DEPLOY_SERVER}"
 REMOTE_USER="${DEPLOY_USER}"
 REMOTE_PATH="${DEPLOY_PATH}"
 DOMAIN="${DEPLOY_DOMAIN}"
@@ -61,18 +63,19 @@ fi
 info "Starting deployment to ${SERVER}..."
 
 # Step 1: Push to git (assuming remote is already configured)
-info "Pushing latest changes to git..."
-git push origin main || warn "Git push failed or already up to date"
+info "Pushing latest changes to git (branch: ${BRANCH})..."
+git push origin "${BRANCH}" || warn "Git push failed or already up to date"
 
 # Step 2: SSH to server and deploy
 info "Connecting to ${SERVER} and deploying..."
 
 # Use SSH agent forwarding to allow git operations on remote server
-ssh -A "${REMOTE_USER}@${SERVER}" "bash -s" -- "${REMOTE_PATH}" << 'ENDSSH'
+ssh -A "${REMOTE_USER}@${SERVER}" "bash -s" -- "${REMOTE_PATH}" "${BRANCH}" << 'ENDSSH'
 set -e
 
-# Get the remote path from the argument
+# Get the remote path and branch from the arguments
 REMOTE_PATH="$1"
+BRANCH="$2"
 
 # Colors for output (redefined for remote session)
 GREEN='\033[0;32m'
@@ -91,8 +94,8 @@ info "Current directory: $(pwd)"
 info "Checking git status..."
 git status
 
-info "Pulling latest code from git..."
-git pull origin main
+info "Pulling latest code from git (branch: ${BRANCH})..."
+git pull origin "${BRANCH}"
 
 info "Installing Composer dependencies (production mode)..."
 docker compose exec -T --user www-data php composer install --no-dev --optimize-autoloader --no-interaction

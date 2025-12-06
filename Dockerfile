@@ -59,6 +59,8 @@ RUN cp "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini" \
 # Copy application files (excluding vendor - see .dockerignore)
 COPY . /var/www/html
 
+# Set ownership of entire application to www-data
+RUN chown -R www-data:www-data /var/www/html
 
 # Create writable home directory for www-data and configure git
 RUN mkdir -p /home/www-data \
@@ -70,55 +72,23 @@ RUN mkdir -p /home/www-data \
 # Set HOME environment variable for www-data
 ENV HOME=/home/www-data
 
-# Create Craft runtime directories and set ownership BEFORE installing composer
-# Note: With bind mounts, these directories will be on the host filesystem
+# Create Craft runtime directories that may not exist yet
 RUN mkdir -p /var/www/html/storage/runtime \
     /var/www/html/storage/logs \
     /var/www/html/storage/backups \
-    /var/www/html/vendor \
     /var/www/html/web/cpresources \
+    /var/www/html/web/uploads \
     /var/www/html/config/project \
-    && chown -R www-data:www-data \
-    /var/www/html/storage \
-    /var/www/html/vendor \
-    /var/www/html/web/cpresources \
-    /var/www/html/config \
-    /var/www/html/.env \
-    && chmod -R 775 \
-    /var/www/html/storage \
-    /var/www/html/vendor \
-    /var/www/html/web/cpresources \
-    /var/www/html/config \
-    && chmod 664 /var/www/html/.env
+    && chown -R www-data:www-data /var/www/html
 
 # Install composer dependencies as www-data user
 RUN su www-data -s /bin/sh -c "composer install --no-dev --optimize-autoloader --no-interaction"
 
-# Fix permissions one final time after composer install
-RUN chown -R www-data:www-data \
-    /var/www/html/storage \
-    /var/www/html/vendor \
-    /var/www/html/web/cpresources \
-    /var/www/html/config \
-    /var/www/html/.env \
-    && chmod -R 775 \
-    /var/www/html/storage \
-    /var/www/html/vendor \
-    /var/www/html/web/cpresources \
-    /var/www/html/config \
-    && chmod 664 /var/www/html/.env
-
-# Create a simple entrypoint script to fix permissions on startup
+# Create a simple entrypoint script to ensure permissions on startup
 RUN echo '#!/bin/sh' > /docker-entrypoint.sh \
     && echo 'set -e' >> /docker-entrypoint.sh \
-    && echo '# Only change ownership of writable directories, preserve file modes' >> /docker-entrypoint.sh \
-    && echo 'chown -R www-data:www-data /var/www/html/storage /var/www/html/web/cpresources 2>/dev/null || true' >> /docker-entrypoint.sh \
-    && echo 'chown www-data:www-data /var/www/html/.env 2>/dev/null || true' >> /docker-entrypoint.sh \
-    && echo '# Set minimum required permissions on directories only' >> /docker-entrypoint.sh \
-    && echo 'find /var/www/html/storage -type d -exec chmod 775 {} + 2>/dev/null || true' >> /docker-entrypoint.sh \
-    && echo 'find /var/www/html/web/cpresources -type d -exec chmod 775 {} + 2>/dev/null || true' >> /docker-entrypoint.sh \
-    && echo '# Ensure storage files are writable by www-data' >> /docker-entrypoint.sh \
-    && echo 'find /var/www/html/storage -type f -exec chmod 664 {} + 2>/dev/null || true' >> /docker-entrypoint.sh \
+    && echo '# Ensure writable directories have correct ownership' >> /docker-entrypoint.sh \
+    && echo 'chown -R www-data:www-data /var/www/html/storage /var/www/html/web/cpresources /var/www/html/web/uploads 2>/dev/null || true' >> /docker-entrypoint.sh \
     && echo 'exec "$@"' >> /docker-entrypoint.sh \
     && chmod +x /docker-entrypoint.sh
 

@@ -1,29 +1,90 @@
-{# This is a comment in Twig! It won’t appear in the HTML output. #}
+{% extends "_layout.twig" %}
 
-{# Here’s some text, dynamically inserted into an HTML tag: #}<h1>
-{{ siteName }}
-</h1>
+{% block content %}
+<style>
+  body {
+    margin: 0;
+    overflow: hidden;
+  }
+  #animation-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
 
-{# What about a dynamic value? #}
-	<p>Today is{{ now | date }}
-!
-</p>
+    background: linear-gradient(
+      to bottom,
+      #0a0a1a 0%,
+      #1a1a3a 50%,
+      #2a1a3a 100%
+    );
 
-{# This is a variable, and it’s being set to a list (or “array”) of colors: #}{% set colors = ['red', 'green', 'blue'] %}
+    /* background-image: linear-gradient(
+      45deg,
+      magenta,
+      rebeccapurple,
+      dodgerblue,
+      green
+    );
+    z-index: -1; */
+    
+  }
 
-{# How many colors are in the list? #}
-	<p>
-	The following list contains{{ colors | length }}
-color(s).
-</p>
+  #animation-container canvas {
+    display: block;
+    cursor: default;
+  }
+  #animation-container canvas.pointer {
+    cursor: pointer;
+  }
 
-{# This is a loop that outputs those items, sorted alphabetically: #}
-	<ul>
-		{% for color in colors | sort %}
-		{# Let’s stylize each item using some inline CSS: #}
-			<li
-			style="color: {{ color }}"> {# The color is capitalized for display: #}
-			{{ color | title }}
-		</li>
-	{% endfor %}
-</ul>
+</style>
+
+<div id="animation-container">
+</div>
+
+{% do craft.app.view.registerJsFile('@web/animation.js', {
+  type: 'module'
+}) %}
+
+<script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    }
+  }
+</script>
+
+<script type="module">
+  import { initAnimation } from '/animation.js';
+
+  // Configuration object with Twig variables
+  const animationConfig = {
+    baseUrl: "{{ siteUrl }}",
+    clickableObjects: {
+      turnip: {
+        url: "{{ entry.turnipUrl ?? 'https://example.com/planet' }}",
+        name: "Turnip Planet",
+      },
+      chili: {
+        url: "{{ entry.chiliUrl ?? 'https://example.com/chili' }}",
+        name: "Chili Satellite",
+      },
+      egg: {
+        url: "{{ entry.eggUrl ?? 'https://example.com/egg' }}",
+        name: "Egg Satellite",
+      },
+      garlic: {
+        url: "{{ entry.garlicUrl ?? 'https://example.com/garlic' }}",
+        name: "Garlic Satellite",
+      },
+    },
+  };
+
+  // Initialize the animation
+  initAnimation(animationConfig);
+</script>
+{% endblock %}

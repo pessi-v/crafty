@@ -42,7 +42,7 @@ fieldLayouts:
 handle: topics
 name: Topics
 siteSettings:
-  d9505feb-37aa-49c1-a4e1-3ea3bb97a5eb: # crafty
+  d9505feb-37aa-49c1-a4e1-3ea3bb97a5eb: # receitas
     hasUrls: true
     template: blog/_topic
     uriFormat: 'blog/topic/{slug}'

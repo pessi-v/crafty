@@ -1,4 +1,4 @@
-dateModified: 1764592798
+dateModified: 1765018994
 email:
   fromEmail: pessimo@posteo.net
   fromName: crafty
@@ -16,6 +16,7 @@ meta:
     1bbcfb83-323f-44d1-89db-a7e3a995cfe1: 'Public Schema' # Public Schema
     3e4eb5c2-aa9b-44b1-882c-7432f09816d4: crafty # crafty
     5cd5bce7-c361-47f8-8133-e355374656a5: Blog # Blog
+    8fc2b849-2a9d-4a31-b0c6-b3d0848b1bbb: Radio # Radio
     009f223b-4694-43e7-9456-f6f90f92f70e: About # About
     106cc540-d266-414a-855d-0210da8bce77: 'Post Categories' # Post Categories
     501d1bf0-a6b7-4518-9e16-52e7b250d894: Text # Text
@@ -26,14 +27,14 @@ meta:
     d1f0727c-56c4-4999-9afb-4c9badc75721: 'Post Content' # Post Content
     d6da9854-1592-4a24-b288-264788c236b0: Text # Text
     d497ff9b-a464-41d9-9984-ba0d369102f9: About # About
-    d9505feb-37aa-49c1-a4e1-3ea3bb97a5eb: crafty # crafty
+    d9505feb-37aa-49c1-a4e1-3ea3bb97a5eb: receitas # receitas
     e925631a-0d0f-4a53-a86c-1ab9c317869c: Thumbnail # Thumbnail
     ec460f54-ce0c-4a23-bb42-5901125cdfce: Image # Image
     fabf8d91-b566-4bc7-901d-9813a689ac30: Topics # Topics
 system:
   edition: solo
   live: true
-  name: crafty
+  name: receitas
   retryDuration: null
   schemaVersion: 5.8.0.3
   timeZone: Europe/Berlin

@@ -1,0 +1,8 @@
+#!/bin/bash
+
+## Description: Deploy the application to the remote server
+## Usage: deploy
+## Example: "ddev deploy"
+
+# Execute the deploy script from the project root
+bash "${DDEV_APPROOT}/deploy.sh"

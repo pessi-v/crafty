@@ -10,23 +10,8 @@
 	</head>
 	<body>
 		{# Get the first segment of the current URI: #}
-		{% set navSegment = craft.app.request.getSegment(1) %}
+		{# {% set navSegment = craft.app.request.getSegment(1) %} #}
 		<header>
-			<a class="home" href="{{ siteUrl }}">{{ siteName }}</a>
-			<nav>
-				<ul>
-					{# comment #}
-					<li>
-						<a href="{{ url('/') }}" class="{{ navSegment is empty ? 'active' : 'inactive' }}">Home</a>
-					</li>
-					<li>
-						<a href="{{ url('blog') }}" class="{{ navSegment == 'blog' ? 'active' : 'inactive' }}">Blog</a>
-					</li>
-					<li>
-						<a href="{{ url('about') }}" class="{{ navSegment == 'about' ? 'active' : 'inactive' }}">About</a>
-					</li>
-				</ul>
-			</nav>
 		</header>
 		<main>
 			{% block content %}
@@ -34,14 +19,16 @@
 			{% endblock %}
 		</main>
 		<footer>
-			<div class="description">
+			{# {{ radio.render }}	 #}
+			{% include '_radio.twig' %}
+			{# <div class="description">
 				{{ siteInfo.description | md }}
 			</div>
 			<div class="copyright">&copy;{{ now | date('Y') }}
 				{{ siteName }}</div>
 			<div class="colophon">Built with
 				<a href="https://craftcms.com/" target="_blank">Craft CMS</a>
-			</div>
+			</div> #}
 		</footer>
 	</body>
 </html>
