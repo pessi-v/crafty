@@ -15,43 +15,67 @@
   })
   .all() %}
 
-{# Helper macro to convert recipes to data array #}
-{% macro prepareRecipeData(recipes) %}
-  {% set recipesData = [] %}
-  {% for recipe in recipes %}
-    {# Render Matrix field content #}
-    {% set contentHtml = '' %}
-    {% if recipe.recipeContent|length %}
-      {% for block in recipe.recipeContent.all() %}
-        {% if block.type.handle == 'text' %}
-          {% set contentHtml = contentHtml ~ '<p>' ~ (block.text|nl2br) ~ '</p>' %}
-        {% elseif block.type.handle == 'image' %}
-          {% if block.image|length %}
-            {% for img in block.image.all() %}
-              {% set contentHtml = contentHtml ~ '<img src="' ~ img.url ~ '" alt="' ~ (img.title ?? '') ~ '" style="max-width: 100%; height: auto; margin: 20px 0; border-radius: 10px;">' %}
-            {% endfor %}
-          {% endif %}
+{# Prepare all recipes data #}
+{% set recipesData = [] %}
+{% for recipe in allRecipes %}
+  {# Render Matrix field content #}
+  {% set contentHtml = '' %}
+  {% if recipe.recipeContent|length %}
+    {% for block in recipe.recipeContent.all() %}
+      {% if block.type.handle == 'text' %}
+        {% set contentHtml = contentHtml ~ '<p>' ~ (block.text|nl2br) ~ '</p>' %}
+      {% elseif block.type.handle == 'image' %}
+        {% if block.image|length %}
+          {% for img in block.image.all() %}
+            {% set contentHtml = contentHtml ~ '<img src="' ~ img.url ~ '" alt="' ~ (img.title ?? '') ~ '" style="max-width: 100%; height: auto; margin: 20px 0; border-radius: 10px;">' %}
+          {% endfor %}
         {% endif %}
-      {% endfor %}
-    {% endif %}
+      {% endif %}
+    {% endfor %}
+  {% endif %}
 
-    {% set recipesData = recipesData|merge([{
-      id: recipe.id,
-      title: recipe.title,
-      slug: recipe.slug,
-      categories: recipe.recipeCategories|map(c => {
-        id: c.id,
-        title: c.title
-      }),
-      content: contentHtml
-    }]) %}
-  {% endfor %}
-  {{ recipesData|json_encode|raw }}
-{% endmacro %}
+  {% set recipesData = recipesData|merge([{
+    id: recipe.id,
+    title: recipe.title,
+    slug: recipe.slug,
+    categories: recipe.recipeCategories|map(c => {
+      id: c.id,
+      title: c.title
+    }),
+    content: contentHtml
+  }]) %}
+{% endfor %}
 
-{# Prepare recipe data for JavaScript #}
-{% set recipesData = _self.prepareRecipeData(allRecipes)|json_decode %}
-{% set spicyRecipesData = _self.prepareRecipeData(spicyRecipes)|json_decode %}
+{# Prepare spicy recipes data #}
+{% set spicyRecipesData = [] %}
+{% for recipe in spicyRecipes %}
+  {# Render Matrix field content #}
+  {% set contentHtml = '' %}
+  {% if recipe.recipeContent|length %}
+    {% for block in recipe.recipeContent.all() %}
+      {% if block.type.handle == 'text' %}
+        {% set contentHtml = contentHtml ~ '<p>' ~ (block.text|nl2br) ~ '</p>' %}
+      {% elseif block.type.handle == 'image' %}
+        {% if block.image|length %}
+          {% for img in block.image.all() %}
+            {% set contentHtml = contentHtml ~ '<img src="' ~ img.url ~ '" alt="' ~ (img.title ?? '') ~ '" style="max-width: 100%; height: auto; margin: 20px 0; border-radius: 10px;">' %}
+          {% endfor %}
+        {% endif %}
+      {% endif %}
+    {% endfor %}
+  {% endif %}
+
+  {% set spicyRecipesData = spicyRecipesData|merge([{
+    id: recipe.id,
+    title: recipe.title,
+    slug: recipe.slug,
+    categories: recipe.recipeCategories|map(c => {
+      id: c.id,
+      title: c.title
+    }),
+    content: contentHtml
+  }]) %}
+{% endfor %}
 <style>
   body {
     margin: 0;
