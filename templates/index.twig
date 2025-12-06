@@ -462,6 +462,10 @@
   const allRecipes = {{ recipesData|json_encode|raw }};
   const spicyRecipes = {{ spicyRecipesData|json_encode|raw }};
 
+  console.log('All recipes:', allRecipes);
+  console.log('Spicy recipes:', spicyRecipes);
+  console.log('window.openModal exists?', typeof window.openModal);
+
   // Configuration object with Twig variables
   const animationConfig = {
     baseUrl: "{{ siteUrl }}",
