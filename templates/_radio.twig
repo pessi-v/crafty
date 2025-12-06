@@ -87,6 +87,7 @@
   </div>
 </div>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.4/howler.min.js"></script>
   <script>
     const channels = {
       1: 'https://stream-relay-geo.ntslive.net/stream',
@@ -94,30 +95,33 @@
       3: 'https://stream-relay-geo.ntslive.net/stream3'
     };
 
-    let audio = null;
+    let sound = null;
     let currentChannel = 1;
     let isPlaying = false;
 
     const playPauseBtn = document.getElementById('playPauseBtn');
     const channelBtns = document.querySelectorAll('.channel-btn');
 
-    function initAudio() {
-      if (!audio) {
-          audio = new Audio(channels[currentChannel]);
+    function initSound() {
+      if (!sound) {
+        sound = new Howl({
+          src: [channels[currentChannel]],
+          html5: true
+        });
       }
     }
 
     function play() {
-      initAudio();
-      audio.play();
+      initSound();
+      sound.play();
       isPlaying = true;
       playPauseBtn.textContent = '⏸';
       playPauseBtn.classList.add('playing');
     }
 
     function pause() {
-      if (audio) {
-          audio.pause();
+      if (sound) {
+        sound.pause();
       }
       isPlaying = false;
       playPauseBtn.textContent = '▶';
@@ -127,33 +131,34 @@
     function switchChannel(channel) {
       const wasPlaying = isPlaying;
 
-      if (audio) {
-          audio.pause();
-          audio = null;
+      if (sound) {
+        sound.stop();
+        sound.unload();
+        sound = null;
       }
 
       currentChannel = channel;
 
       channelBtns.forEach(btn => {
-          btn.classList.toggle('active', btn.dataset.channel == channel);
+        btn.classList.toggle('active', btn.dataset.channel == channel);
       });
 
       if (wasPlaying) {
-          play();
+        play();
       }
     }
 
     playPauseBtn.addEventListener('click', () => {
       if (isPlaying) {
-          pause();
+        pause();
       } else {
-          play();
+        play();
       }
     });
 
     channelBtns.forEach(btn => {
       btn.addEventListener('click', () => {
-          switchChannel(parseInt(btn.dataset.channel));
+        switchChannel(parseInt(btn.dataset.channel));
       });
     });
   </script>
