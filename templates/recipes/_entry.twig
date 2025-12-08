@@ -1,0 +1,22 @@
+{% extends '_layout' %}
+
+{# Using the generic 'entry' variable for our Recipe #}
+
+{# Images need to be loaded here before the block #}
+{# {% set featureImage = entry.featureImage.one() %} #}
+
+{# Load attached topics: #}
+{% set labels = entry.recipeCategories.all() %}
+
+{% block content %}
+  {{ entry.title }}
+  
+  {% if labels | length %}
+  <ul class="labels">
+    {% for label in labels %}
+      <li>{{ label.getLink() }}</li>
+    {% endfor %}
+  </ul>
+{% endif %}
+
+{% endblock %}
