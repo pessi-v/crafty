@@ -29,6 +29,34 @@
     listTitle: listTitle
   } %}
 
+{% elseif view == 'egg' %}
+  {# Query egg recipes #}
+  {% set recipes = craft.entries()
+    .section('recipes')
+    .relatedTo({
+      targetElement: craft.categories().slug('egg').one()
+    })
+    .all() %}
+
+  {% include 'recipes/_modal-list' with {
+    recipes: recipes,
+    listTitle: listTitle
+  } %}
+
+{% elseif view == 'garlic' %}
+  {# Query garlic recipes #}
+  {% set recipes = craft.entries()
+    .section('recipes')
+    .relatedTo({
+      targetElement: craft.categories().slug('garlic').one()
+    })
+    .all() %}
+
+  {% include 'recipes/_modal-list' with {
+    recipes: recipes,
+    listTitle: listTitle
+  } %}
+
 {% elseif view == 'detail' %}
   {# Render single recipe detail #}
   {% set recipeId = craft.app.request.getParam('recipeId') %}

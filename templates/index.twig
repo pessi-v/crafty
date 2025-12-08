@@ -32,7 +32,9 @@
 
   // Fetch rendered Twig template via AJAX
   async function fetchModalContent(params) {
-    const url = new URL('{{ url('recipes/ajax-modal') }}');
+    const url = new URL('{{ siteUrl('recipes/ajax-modal') }}');
+    console.log("bobby: " + "{{ siteUrl}}")
+    console.log("bobby: " + "{{ url('recipes/ajax-modal') }}")
     Object.keys(params).forEach(key => {
       if (params[key] !== undefined && params[key] !== null) {
         url.searchParams.append(key, params[key]);
@@ -82,6 +84,7 @@
 
   async function displayRecipeList(config) {
     const modalInner = document.getElementById('modal-inner');
+    // console.log(modalInner)
 
     // Show loading state
     // modalInner.innerHTML = '<div style="text-align: center; padding: 40px;">Loading...</div>';
@@ -173,6 +176,8 @@
   console.log('window.openModal exists?', typeof window.openModal);
 
   // Configuration object with Twig variables
+  console.log("bob: " + "{{ siteUrl }}")
+  console.log("bob: " + "{{ url() }}")
   const animationConfig = {
     baseUrl: "{{ siteUrl }}",
     clickableObjects: {
