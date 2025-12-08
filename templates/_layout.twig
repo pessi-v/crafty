@@ -5,7 +5,18 @@
 		<title>{{ siteName }}</title>
 		<meta content="width=device-width, initial-scale=1.0" name="viewport">
 
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+					"three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+				}
+			}
+		</script>
+
 		{% do craft.app.view.registerCssFile('@web/styles.css') %}
+		{% do craft.app.view.registerCssFile('@web/animation.css') %}
+		{% do craft.app.view.registerCssFile('@web/modal.css') %}
 
 	</head>
 	<body>

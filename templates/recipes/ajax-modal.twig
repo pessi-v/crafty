@@ -1,15 +1,27 @@
 {# AJAX endpoint for rendering modal content #}
-{# Expects: view (list|detail), recipeIds, recipeId, listTitle #}
+{# Expects: view (all|spicy|detail), recipeId (for detail view), listTitle #}
 
 {% set view = craft.app.request.getParam('view') %}
 {% set listTitle = craft.app.request.getParam('listTitle') %}
 
-{% if view == 'list' %}
-  {# Render recipe list #}
-  {% set recipeIds = craft.app.request.getParam('recipeIds')|split(',') %}
+{% if view == 'all' %}
+  {# Query all recipes #}
   {% set recipes = craft.entries()
     .section('recipes')
-    .id(recipeIds)
+    .all() %}
+
+  {% include 'recipes/_modal-list' with {
+    recipes: recipes,
+    listTitle: listTitle
+  } %}
+
+{% elseif view == 'spicy' %}
+  {# Query spicy recipes #}
+  {% set recipes = craft.entries()
+    .section('recipes')
+    .relatedTo({
+      targetElement: craft.categories().slug('spicy').one()
+    })
     .all() %}
 
   {% include 'recipes/_modal-list' with {
