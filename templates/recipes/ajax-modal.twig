@@ -1,0 +1,37 @@
+{# AJAX endpoint for rendering modal content #}
+{# Expects: view (list|detail), recipeIds, recipeId, listTitle #}
+
+{% set view = craft.app.request.getParam('view') %}
+{% set listTitle = craft.app.request.getParam('listTitle') %}
+
+{% if view == 'list' %}
+  {# Render recipe list #}
+  {% set recipeIds = craft.app.request.getParam('recipeIds')|split(',') %}
+  {% set recipes = craft.entries()
+    .section('recipes')
+    .id(recipeIds)
+    .all() %}
+
+  {% include 'recipes/_modal-list' with {
+    recipes: recipes,
+    listTitle: listTitle
+  } %}
+
+{% elseif view == 'detail' %}
+  {# Render single recipe detail #}
+  {% set recipeId = craft.app.request.getParam('recipeId') %}
+  {% set recipe = craft.entries()
+    .section('recipes')
+    .id(recipeId)
+    .one() %}
+
+  {% if recipe %}
+    {% include 'recipes/_modal-detail' with {
+      recipe: recipe,
+      listTitle: listTitle
+    } %}
+  {% else %}
+    <p>Recipe not found</p>
+  {% endif %}
+
+{% endif %}

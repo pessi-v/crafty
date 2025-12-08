@@ -1,0 +1,22 @@
+{# Recipe list view for modal #}
+{# Expected variables: recipes, listTitle #}
+
+<h1 class="modal-title">{{ listTitle }}</h1>
+<div class="recipe-list">
+  {% if recipes|length %}
+    {% for recipe in recipes %}
+      <div class="recipe-list-item" data-recipe-id="{{ recipe.id }}">
+        <h3>{{ recipe.title }}</h3>
+        {% if recipe.recipeCategories|length %}
+          <div class="recipe-categories">
+            {% for category in recipe.recipeCategories.all() %}
+              <span class="recipe-category-tag">{{ category.title }}</span>
+            {% endfor %}
+          </div>
+        {% endif %}
+      </div>
+    {% endfor %}
+  {% else %}
+    <p>No recipes found</p>
+  {% endif %}
+</div>

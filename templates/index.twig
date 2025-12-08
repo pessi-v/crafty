@@ -15,75 +15,19 @@
   })
   .all() %}
 
-{# Prepare all recipes data #}
+{# Prepare recipe data (only IDs needed for AJAX approach) #}
 {% set recipesData = [] %}
 {% for recipe in allRecipes %}
-  {# Render Matrix field content #}
-  {% set contentHtml = '' %}
-  {% if recipe.recipeContent|length %}
-    {% for block in recipe.recipeContent.all() %}
-      {% if block.type.handle == 'text' %}
-        {% set contentHtml = contentHtml ~ '<p>' ~ (block.text|nl2br) ~ '</p>' %}
-      {% elseif block.type.handle == 'image' %}
-        {% if block.image|length %}
-          {% for img in block.image.all() %}
-            {% set contentHtml = contentHtml ~ '<img src="' ~ img.url ~ '" alt="' ~ (img.title ?? '') ~ '" style="max-width: 100%; height: auto; margin: 20px 0; border-radius: 10px;">' %}
-          {% endfor %}
-        {% endif %}
-      {% endif %}
-    {% endfor %}
-  {% endif %}
-
-  {% set recipeCategories = [] %}
-  {% for cat in recipe.recipeCategories.all() %}
-    {% set recipeCategories = recipeCategories|merge([{
-      id: cat.id,
-      title: cat.title
-    }]) %}
-  {% endfor %}
-
   {% set recipesData = recipesData|merge([{
-    id: recipe.id,
-    title: recipe.title,
-    slug: recipe.slug,
-    categories: recipeCategories,
-    content: contentHtml
+    id: recipe.id
   }]) %}
 {% endfor %}
 
 {# Prepare spicy recipes data #}
 {% set spicyRecipesData = [] %}
 {% for recipe in spicyRecipes %}
-  {# Render Matrix field content #}
-  {% set contentHtml = '' %}
-  {% if recipe.recipeContent|length %}
-    {% for block in recipe.recipeContent.all() %}
-      {% if block.type.handle == 'text' %}
-        {% set contentHtml = contentHtml ~ '<p>' ~ (block.text|nl2br) ~ '</p>' %}
-      {% elseif block.type.handle == 'image' %}
-        {% if block.image|length %}
-          {% for img in block.image.all() %}
-            {% set contentHtml = contentHtml ~ '<img src="' ~ img.url ~ '" alt="' ~ (img.title ?? '') ~ '" style="max-width: 100%; height: auto; margin: 20px 0; border-radius: 10px;">' %}
-          {% endfor %}
-        {% endif %}
-      {% endif %}
-    {% endfor %}
-  {% endif %}
-
-  {% set recipeCategories = [] %}
-  {% for cat in recipe.recipeCategories.all() %}
-    {% set recipeCategories = recipeCategories|merge([{
-      id: cat.id,
-      title: cat.title
-    }]) %}
-  {% endfor %}
-
   {% set spicyRecipesData = spicyRecipesData|merge([{
-    id: recipe.id,
-    title: recipe.title,
-    slug: recipe.slug,
-    categories: recipeCategories,
-    content: contentHtml
+    id: recipe.id
   }]) %}
 {% endfor %}
 <style>
@@ -105,16 +49,6 @@
       #1a1a3a 50%,
       #2a1a3a 100%
     );
-
-    /* background-image: linear-gradient(
-      45deg,
-      magenta,
-      rebeccapurple,
-      dodgerblue,
-      green
-    );
-    z-index: -1; */
-    
   }
 
   #animation-container canvas {
@@ -125,29 +59,18 @@
     cursor: pointer;
   }
 
-  /* Modal styles */
-  .modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
+  /* Modal content styling */
+  .dialog-container {
+    z-index: 10000 !important;
+  }
+
+  .dialog-container .dialog-overlay {
     background: rgba(0, 0, 0, 0.8);
     backdrop-filter: blur(5px);
-    display: none;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-    opacity: 0;
-    transition: opacity 0.3s ease;
+    pointer-events: auto !important;
   }
 
-  .modal-overlay.active {
-    display: flex;
-    opacity: 1;
-  }
-
-  .modal-content {
+  .dialog-container .dialog-content {
     background: linear-gradient(135deg, #1a1a3a 0%, #2a1a3a 100%);
     border: 2px solid rgba(255, 255, 255, 0.1);
     border-radius: 20px;
@@ -156,46 +79,36 @@
     width: 90%;
     overflow-y: auto;
     padding: 40px;
-    position: relative;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-    transform: scale(0.9);
-    transition: transform 0.3s ease;
     color: #ffffff;
+    pointer-events: auto !important;
   }
 
-  .modal-overlay.active .modal-content {
-    transform: scale(1);
+  /* Custom scrollbar for modal */
+  .dialog-container .dialog-content::-webkit-scrollbar {
+    width: 10px;
   }
 
-  .modal-close {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    color: white;
-    font-size: 24px;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s ease;
+  .dialog-container .dialog-content::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
   }
 
-  .modal-close:hover {
+  .dialog-container .dialog-content::-webkit-scrollbar-thumb {
     background: rgba(255, 255, 255, 0.2);
-    transform: rotate(90deg);
+    border-radius: 10px;
   }
 
-  .modal-title {
+  .dialog-container .dialog-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+  }
+
+  /* .modal-title {
     font-size: 2em;
     margin: 0 0 20px 0;
     color: #ffffff;
     text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-  }
+  } */
 
   .modal-body {
     line-height: 1.6;
@@ -216,59 +129,22 @@
     margin-bottom: 1em;
   }
 
-  .modal-loading {
-    text-align: center;
-    padding: 40px;
-    font-size: 1.2em;
-    color: rgba(255, 255, 255, 0.7);
-  }
-
-  /* Custom scrollbar for modal */
-  .modal-content::-webkit-scrollbar {
-    width: 10px;
-  }
-
-  .modal-content::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 10px;
-  }
-
-  .modal-content::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 10px;
-  }
-
-  .modal-content::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.3);
-  }
-
   /* Recipe list styles */
   .recipe-list {
     display: grid;
-    gap: 15px;
+    gap: 5px;
     margin-top: 20px;
   }
 
   .recipe-list-item {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 10px;
-    padding: 20px;
     cursor: pointer;
-    transition: all 0.2s ease;
   }
 
-  .recipe-list-item:hover {
-    background: rgba(255, 255, 255, 0.1);
-    border-color: rgba(255, 255, 255, 0.2);
-    transform: translateX(5px);
-  }
+  /* .recipe-list-item:hover {
+  } */
 
-  .recipe-list-item h3 {
-    margin: 0 0 10px 0;
-    color: #ffffff;
-    font-size: 1.3em;
-  }
+  /* .recipe-list-item h3 {
+  } */
 
   .recipe-categories {
     display: flex;
@@ -276,14 +152,8 @@
     gap: 8px;
   }
 
-  .recipe-category-tag {
-    display: inline-block;
-    background: rgba(255, 255, 255, 0.1);
-    padding: 4px 12px;
-    border-radius: 12px;
-    font-size: 0.85em;
-    color: rgba(255, 255, 255, 0.8);
-  }
+  /* .recipe-category-tag {
+  } */
 
   /* Back button */
   .modal-back-button {
@@ -310,21 +180,23 @@
     content: "←";
     font-size: 1.2em;
   }
-
 </style>
 
 <div id="animation-container">
 </div>
 
-<!-- Modal -->
-<div id="recipe-modal" class="modal-overlay">
-  <div class="modal-content">
-    <button class="modal-close" onclick="closeModal()">&times;</button>
+{# Recipe Modal using Modal Component plugin #}
+{% embed 'snippets-modal/modal' with {
+  modalId: 'recipe-modal',
+} %}
+  {% block content %}
     <div id="modal-inner">
-      <div class="modal-loading">Loading...</div>
+      <div style="text-align: center; padding: 40px; font-size: 1.2em; color: rgba(255, 255, 255, 0.7);">
+        Loading...
+      </div>
     </div>
-  </div>
-</div>
+  {% endblock %}
+{% endembed %}
 
 {% do craft.app.view.registerJsFile('@web/animation.js', {
   type: 'module'
@@ -340,16 +212,36 @@
 </script>
 
 <script>
-  // Modal functions - MUST be defined before animation initializes
+  // Modal functions using Modal Component plugin with AJAX Twig rendering
   // Store current modal state
   let currentModalState = null;
 
-  // Modal functions
-  function openModal(config) {
-    const modal = document.getElementById('recipe-modal');
+  // Get the modal dialog instance
+  function getModalDialog() {
+    const modalElement = document.getElementById('recipe-modal');
+    return modalElement ? modalElement._dialog : null;
+  }
 
-    // Show modal
-    modal.classList.add('active');
+  // Fetch rendered Twig template via AJAX
+  async function fetchModalContent(params) {
+    const url = new URL('{{ url('recipes/ajax-modal') }}');
+    Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
+
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error('Failed to load modal content');
+    }
+    return await response.text();
+  }
+
+  // Modal functions
+  async function openModal(config) {
+    // Prevent opening if modal is already open
+    const dialog = getModalDialog();
+    if (dialog && dialog.shown) {
+      console.log('Modal already open, ignoring click');
+      return;
+    }
 
     // Store the config for back navigation
     currentModalState = {
@@ -359,83 +251,79 @@
 
     // Display recipe list
     if (config.type === 'list') {
-      displayRecipeList(config);
+      await displayRecipeList(config);
+    }
+
+    // Show modal using plugin API
+    if (dialog) {
+      dialog.show();
     }
   }
 
   function closeModal() {
-    const modal = document.getElementById('recipe-modal');
-    modal.classList.remove('active');
+    const dialog = getModalDialog();
+    if (dialog) {
+      dialog.hide();
+    }
     currentModalState = null;
   }
 
-  function displayRecipeList(config) {
+  async function displayRecipeList(config) {
     const modalInner = document.getElementById('modal-inner');
 
-    const recipesHtml = config.recipes.map(recipe => {
-      const categoriesHtml = recipe.categories && recipe.categories.length > 0
-        ? `<div class="recipe-categories">
-            ${recipe.categories.map(cat =>
-              `<span class="recipe-category-tag">${cat.title}</span>`
-            ).join('')}
-          </div>`
-        : '';
+    // Show loading state
+    modalInner.innerHTML = '<div style="text-align: center; padding: 40px;">Loading...</div>';
 
-      return `
-        <div class="recipe-list-item" onclick="showRecipeDetail(${recipe.id})">
-          <h3>${recipe.title}</h3>
-          ${categoriesHtml}
-        </div>
-      `;
-    }).join('');
+    try {
+      // Get recipe IDs from config
+      const recipeIds = config.recipes.map(r => r.id).join(',');
 
-    modalInner.innerHTML = `
-      <h1 class="modal-title">${config.listTitle}</h1>
-      <div class="recipe-list">
-        ${recipesHtml.length > 0 ? recipesHtml : '<p>No recipes found</p>'}
-      </div>
-    `;
+      // Fetch rendered Twig template
+      const html = await fetchModalContent({
+        view: 'list',
+        recipeIds: recipeIds,
+        listTitle: config.listTitle
+      });
 
-    // Update modal state
-    currentModalState.view = 'list';
+      modalInner.innerHTML = html;
+
+      // Update modal state
+      currentModalState.view = 'list';
+    } catch (error) {
+      console.error('Error loading recipe list:', error);
+      modalInner.innerHTML = '<p>Error loading recipes. Please try again.</p>';
+    }
   }
 
-  function showRecipeDetail(recipeId) {
+  async function showRecipeDetail(recipeId) {
     const modalInner = document.getElementById('modal-inner');
 
-    // Find the recipe in the current config
-    const recipe = currentModalState.config.recipes.find(r => r.id == recipeId);
+    // Show loading state
+    modalInner.innerHTML = '<div style="text-align: center; padding: 40px;">Loading...</div>';
 
-    if (!recipe) {
-      console.error('Recipe not found:', recipeId);
-      return;
+    try {
+      // Fetch rendered Twig template
+      const html = await fetchModalContent({
+        view: 'detail',
+        recipeId: recipeId,
+        listTitle: currentModalState.config.listTitle
+      });
+
+      modalInner.innerHTML = html;
+
+      // Scroll to top of modal
+      const dialogContent = document.querySelector('#recipe-modal .dialog-content');
+      if (dialogContent) {
+        dialogContent.scrollTop = 0;
+      }
+
+      // Update modal state
+      currentModalState.view = 'detail';
+      currentModalState.currentRecipeId = recipeId;
+    } catch (error) {
+      console.error('Error loading recipe detail:', error);
+      modalInner.innerHTML = '<p>Error loading recipe. Please try again.</p>';
     }
-
-    const categoriesHtml = recipe.categories && recipe.categories.length > 0
-      ? `<div style="margin-bottom: 20px;">
-          ${recipe.categories.map(cat =>
-            `<span style="display: inline-block; background: rgba(255,255,255,0.1); padding: 5px 15px; border-radius: 15px; margin-right: 10px; font-size: 0.9em;">
-              ${cat.title}
-            </span>`
-          ).join('')}
-        </div>`
-      : '';
-
-    modalInner.innerHTML = `
-      <button class="modal-back-button" onclick="backToList()">Back to ${currentModalState.config.listTitle}</button>
-      <h1 class="modal-title">${recipe.title}</h1>
-      ${categoriesHtml}
-      <div class="modal-body">
-        ${recipe.content || '<p>No content available</p>'}
-      </div>
-    `;
-
-    // Scroll to top of modal
-    document.querySelector('.modal-content').scrollTop = 0;
-
-    // Update modal state
-    currentModalState.view = 'detail';
-    currentModalState.currentRecipe = recipe;
   }
 
   function backToList() {
@@ -444,17 +332,23 @@
     }
   }
 
-  // Close modal when clicking outside
-  document.getElementById('recipe-modal').addEventListener('click', function(e) {
-    if (e.target === this) {
-      closeModal();
+  // Event delegation for dynamically loaded content
+  document.getElementById('modal-inner').addEventListener('click', function(e) {
+    // Handle recipe list item clicks
+    const recipeItem = e.target.closest('.recipe-list-item');
+    if (recipeItem) {
+      const recipeId = recipeItem.getAttribute('data-recipe-id');
+      if (recipeId) {
+        showRecipeDetail(recipeId);
+      }
+      return;
     }
-  });
 
-  // Close modal with ESC key
-  document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') {
-      closeModal();
+    // Handle back button clicks
+    const backButton = e.target.closest('[data-action="back"]');
+    if (backButton) {
+      backToList();
+      return;
     }
   });
 
