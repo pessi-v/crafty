@@ -90,50 +90,68 @@ export function initAnimation(config) {
   const orbitalData = {
     chili: {
       radius: 3.5,
-      speed: 0.35,
+      speed: 0.2,
       tilt: 0.1,
       yOffset: 0.2,
       startAngle: 0,
+      rotationX: 0.008,
+      rotationY: 0.012,
+      rotationZ: 0.003,
       model: null,
     },
     egg: {
       radius: 4.5,
-      speed: 0.35,
+      speed: 0.2,
       tilt: -0.15,
       yOffset: -0.3,
       startAngle: Math.PI * 0.6, // ~108 degrees offset
+      rotationX: 0.005,
+      rotationY: 0.015,
+      rotationZ: 0.007,
       model: null,
     },
     garlic: {
       radius: 5.5,
-      speed: 0.35,
+      speed: 0.2,
       tilt: 0.05,
       yOffset: 0.1,
       startAngle: Math.PI * 1.2, // ~216 degrees offset
+      rotationX: 0.011,
+      rotationY: 0.006,
+      rotationZ: 0.004,
       model: null,
     },
     pig: {
       radius: 6.5,
-      speed: 0.28,
+      speed: 0.2,
       tilt: -0.08,
       yOffset: 0.3,
       startAngle: Math.PI * 0.3, // ~54 degrees offset
+      rotationX: 0.009,
+      rotationY: 0.013,
+      rotationZ: 0.002,
       model: null,
     },
     eggplant: {
       radius: 4.0,
-      speed: 0.42,
+      speed: 0.2,
       tilt: 0.12,
       yOffset: -0.1,
       startAngle: Math.PI * 1.5, // ~270 degrees offset
+      rotationX: 0.007,
+      rotationY: 0.01,
+      rotationZ: 0.008,
       model: null,
     },
     peapod: {
       radius: 7.0,
-      speed: 0.25,
+      speed: 0.2,
       tilt: -0.05,
       yOffset: 0.0,
       startAngle: Math.PI * 1.8, // ~324 degrees offset
+      rotationX: 0.006,
+      rotationY: 0.014,
+      rotationZ: 0.005,
       model: null,
     },
   };
@@ -257,9 +275,10 @@ export function initAnimation(config) {
           y * Math.cos(satellite.tilt) + x * Math.sin(satellite.tilt);
         satellite.model.position.z = z;
 
-        // Rotate satellite on its own axis
-        satellite.model.rotation.y += 0.02;
-        satellite.model.rotation.x += 0.01;
+        // Rotate satellite on its own axis with unique tumbling pattern
+        satellite.model.rotation.x += satellite.rotationX;
+        satellite.model.rotation.y += satellite.rotationY;
+        satellite.model.rotation.z += satellite.rotationZ;
 
         // Depth sorting for occlusion
         // Calculate if satellite is behind planet

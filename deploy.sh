@@ -97,6 +97,12 @@ git status
 info "Pulling latest code from git (branch: ${BRANCH})..."
 git pull origin "${BRANCH}"
 
+info "rebuilding Dockerimage"
+docker compose build php
+
+info "restarting with new Dockerimage"
+docker compose up -d
+
 info "Installing Composer dependencies (production mode)..."
 docker compose exec -T --user www-data php composer install --no-dev --optimize-autoloader --no-interaction
 
