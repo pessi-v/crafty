@@ -1,44 +1,34 @@
 /* Modal content styling */
-.dialog-container {
+.snippets-modal__container {
   z-index: 10000 !important;
 }
 
-.dialog-container .dialog-overlay {
-  background: rgba(0, 0, 0, 0.8);
-  backdrop-filter: blur(5px);
+.snippets-modal__container .snippets-modal__overlay {
+  /* background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(5px); */
   pointer-events: auto !important;
 }
 
-.dialog-container .dialog-content {
-  background: linear-gradient(135deg, #1a1a3a 0%, #2a1a3a 100%);
-  border: 2px solid rgba(255, 255, 255, 0.1);
-  border-radius: 20px;
-  max-width: 800px;
-  max-height: 80vh;
-  width: 90%;
-  overflow-y: auto;
-  padding: 40px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-  color: #ffffff;
-  pointer-events: auto !important;
+.snippets-modal__container .snippets-modal__content {
 }
 
 /* Custom scrollbar for modal */
-.dialog-container .dialog-content::-webkit-scrollbar {
+.snippets-modal__container .snippets-modal__content::-webkit-scrollbar {
   width: 10px;
 }
 
-.dialog-container .dialog-content::-webkit-scrollbar-track {
+.snippets-modal__container .snippets-modal__content::-webkit-scrollbar-track {
   background: rgba(255, 255, 255, 0.05);
   border-radius: 10px;
 }
 
-.dialog-container .dialog-content::-webkit-scrollbar-thumb {
+.snippets-modal__container .snippets-modal__content::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.2);
   border-radius: 10px;
 }
 
-.dialog-container .dialog-content::-webkit-scrollbar-thumb:hover {
+.snippets-modal__container
+  .snippets-modal__content::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.3);
 }
 
@@ -47,7 +37,9 @@
   line-height: 1.6;
 }
 
-.modal-body h1, .modal-body h2, .modal-body h3 {
+.modal-body h1,
+.modal-body h2,
+.modal-body h3 {
   margin-top: 1.5em;
   margin-bottom: 0.5em;
   color: #ffffff;
@@ -57,7 +49,8 @@
   margin-bottom: 1em;
 }
 
-.modal-body ul, .modal-body ol {
+.modal-body ul,
+.modal-body ol {
   margin-left: 20px;
   margin-bottom: 1em;
 }

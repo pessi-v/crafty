@@ -261,7 +261,7 @@ export function initAnimation(config) {
     Object.keys(orbitalData).forEach((key) => {
       const satellite = orbitalData[key];
       if (satellite.model) {
-        const angle = time * satellite.speed + satellite.startAngle;
+        const angle = -time * satellite.speed + satellite.startAngle;
 
         // Calculate orbital position
         const x = Math.cos(angle) * satellite.radius;
@@ -386,9 +386,6 @@ export function initAnimation(config) {
 
       if (objectType && clickableObjects[objectType]) {
         const config = clickableObjects[objectType];
-        console.log(`Clicked on ${config.name}`);
-        console.log("Config:", config);
-        console.log("window.openModal available?", typeof window.openModal);
 
         // Open modal with entry data
         if (window.openModal) {

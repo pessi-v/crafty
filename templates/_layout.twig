@@ -18,28 +18,25 @@
 		{% do craft.app.view.registerCssFile('@web/animation.css') %}
 		{% do craft.app.view.registerCssFile('@web/modal.css') %}
 
+		<!--Attribution for 3D objects:
+		Chili Pepper by jeremy [CC-BY] (https://creativecommons.org/licenses/by/3.0/) via Poly Pizza (https://poly.pizza/m/2x3UVYE7D-R)
+		Turnip by Poly by Google [CC-BY] (https://creativecommons.org/licenses/by/3.0/) via Poly Pizza (https://poly.pizza/m/5brWxvZdGsz)
+		Egg by Poly by Google [CC-BY] (https://creativecommons.org/licenses/by/3.0/) via Poly Pizza (https://poly.pizza/m/6IlWtCejyrO)
+		Garlic by Poly by Google [CC-BY] (https://creativecommons.org/licenses/by/3.0/) via Poly Pizza (https://poly.pizza/m/0obkpR0BuEa)
+		Peapod by Poly by Google [CC-BY] (https://creativecommons.org/licenses/by/3.0/) via Poly Pizza (https://poly.pizza/m/5NbJiEDdCuJ)
+		Eggplant by Poly by Google [CC-BY] (https://creativecommons.org/licenses/by/3.0/) via Poly Pizza (https://poly.pizza/m/abKWST5Odkg)
+		Pig by Poly by Google [CC-BY] (https://creativecommons.org/licenses/by/3.0/) via Poly Pizza (https://poly.pizza/m/6XC3XssJIU_) -->
+
 	</head>
 	<body>
-		{# Get the first segment of the current URI: #}
-		{# {% set navSegment = craft.app.request.getSegment(1) %} #}
 		<header>
 		</header>
 		<main>
 			{% block content %}
-				{# Nothing here, yet! #}
 			{% endblock %}
 		</main>
 		<footer>
-			{# {{ radio.render }}	 #}
 			{% include '_radio.twig' %}
-			{# <div class="description">
-				{{ siteInfo.description | md }}
-			</div>
-			<div class="copyright">&copy;{{ now | date('Y') }}
-				{{ siteName }}</div>
-			<div class="colophon">Built with
-				<a href="https://craftcms.com/" target="_blank">Craft CMS</a>
-			</div> #}
 		</footer>
 	</body>
 </html>
