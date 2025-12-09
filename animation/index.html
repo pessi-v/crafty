@@ -449,6 +449,7 @@
           if (objectType && clickableObjects[objectType]) {
             const config = clickableObjects[objectType];
             console.log(`Clicked on ${config.name}`);
+            console.log("we shouldn't be here, but here we are");
 
             // Navigate to URL
             window.location.href = config.url;
