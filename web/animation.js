@@ -8,7 +8,7 @@ import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
  * @param {Object} config.clickableObjects - Object mapping model names to URLs and names
  */
 export function initAnimation(config) {
-  const container = document.getElementById('animation-container');
+  const container = document.getElementById("animation-container");
 
   // Scene setup
   const scene = new THREE.Scene();
@@ -90,16 +90,18 @@ export function initAnimation(config) {
   const orbitalData = {
     chili: {
       radius: 3.5,
-      speed: 0.6,
+      speed: 0.35,
       tilt: 0.1,
       yOffset: 0.2,
+      startAngle: 0,
       model: null,
     },
     egg: {
       radius: 4.5,
-      speed: 0.5,
+      speed: 0.35,
       tilt: -0.15,
       yOffset: -0.3,
+      startAngle: Math.PI * 0.6, // ~108 degrees offset
       model: null,
     },
     garlic: {
@@ -107,6 +109,31 @@ export function initAnimation(config) {
       speed: 0.35,
       tilt: 0.05,
       yOffset: 0.1,
+      startAngle: Math.PI * 1.2, // ~216 degrees offset
+      model: null,
+    },
+    pig: {
+      radius: 6.5,
+      speed: 0.28,
+      tilt: -0.08,
+      yOffset: 0.3,
+      startAngle: Math.PI * 0.3, // ~54 degrees offset
+      model: null,
+    },
+    eggplant: {
+      radius: 4.0,
+      speed: 0.42,
+      tilt: 0.12,
+      yOffset: -0.1,
+      startAngle: Math.PI * 1.5, // ~270 degrees offset
+      model: null,
+    },
+    peapod: {
+      radius: 7.0,
+      speed: 0.25,
+      tilt: -0.05,
+      yOffset: 0.0,
+      startAngle: Math.PI * 1.8, // ~324 degrees offset
       model: null,
     },
   };
@@ -164,71 +191,37 @@ export function initAnimation(config) {
     }
   );
 
-  // Load Chili (Satellite 1)
-  loader.load(
-    `${baseUrl}Chili.glb`,
-    (gltf) => {
-      const model = gltf.scene;
-      model.traverse((child) => {
-        if (child.isMesh) {
-          child.castShadow = true;
-          child.receiveShadow = true;
-        }
-      });
-      model.scale.set(0.1, 0.1, 0.1);
-      orbitalData.chili.model = model;
-      scene.add(model);
-      onModelLoaded();
-    },
-    undefined,
-    (error) => {
-      console.error("Error loading Chili:", error);
-    }
-  );
+  // Helper function to load satellites
+  function loadSatellite(name, scale) {
+    loader.load(
+      `${baseUrl}${name.charAt(0).toUpperCase() + name.slice(1)}.glb`,
+      (gltf) => {
+        const model = gltf.scene;
+        model.traverse((child) => {
+          if (child.isMesh) {
+            child.castShadow = true;
+            child.receiveShadow = true;
+          }
+        });
+        model.scale.set(scale, scale, scale);
+        orbitalData[name].model = model;
+        scene.add(model);
+        onModelLoaded();
+      },
+      undefined,
+      (error) => {
+        console.error(`Error loading ${name}:`, error);
+      }
+    );
+  }
 
-  // Load Egg (Satellite 2)
-  loader.load(
-    `${baseUrl}Egg.glb`,
-    (gltf) => {
-      const model = gltf.scene;
-      model.traverse((child) => {
-        if (child.isMesh) {
-          child.castShadow = true;
-          child.receiveShadow = true;
-        }
-      });
-      model.scale.set(0.005, 0.005, 0.005);
-      orbitalData.egg.model = model;
-      scene.add(model);
-      onModelLoaded();
-    },
-    undefined,
-    (error) => {
-      console.error("Error loading Egg:", error);
-    }
-  );
-
-  // Load Garlic (Satellite 3)
-  loader.load(
-    `${baseUrl}Garlic.glb`,
-    (gltf) => {
-      const model = gltf.scene;
-      model.traverse((child) => {
-        if (child.isMesh) {
-          child.castShadow = true;
-          child.receiveShadow = true;
-        }
-      });
-      model.scale.set(0.1, 0.1, 0.1);
-      orbitalData.garlic.model = model;
-      scene.add(model);
-      onModelLoaded();
-    },
-    undefined,
-    (error) => {
-      console.error("Error loading Garlic:", error);
-    }
-  );
+  // Load satellites
+  loadSatellite("chili", 0.1);
+  loadSatellite("egg", 0.005);
+  loadSatellite("garlic", 0.1);
+  loadSatellite("pig", 0.005);
+  loadSatellite("eggplant", 0.45);
+  loadSatellite("peapod", 0.08);
 
   // Animation variables
   let time = 0;
@@ -250,7 +243,7 @@ export function initAnimation(config) {
     Object.keys(orbitalData).forEach((key) => {
       const satellite = orbitalData[key];
       if (satellite.model) {
-        const angle = time * satellite.speed;
+        const angle = time * satellite.speed + satellite.startAngle;
 
         // Calculate orbital position
         const x = Math.cos(angle) * satellite.radius;
@@ -294,8 +287,7 @@ export function initAnimation(config) {
     const cameraRadius = 15;
     const cameraSpeed = 0.01;
     camera.position.x = Math.cos(time * cameraSpeed) * cameraRadius * 0.3;
-    camera.position.z =
-      Math.sin(time * cameraSpeed) * cameraRadius * 0.6 + 12;
+    camera.position.z = Math.sin(time * cameraSpeed) * cameraRadius * 0.6 + 12;
     camera.position.y = 5 + Math.sin(time * cameraSpeed * 0.5) * 1;
     camera.lookAt(0, 0, 0);
 
@@ -343,10 +335,7 @@ export function initAnimation(config) {
 
     // Update raycaster
     raycaster.setFromCamera(mouse, camera);
-    const intersects = raycaster.intersectObjects(
-      getClickableMeshes(),
-      false
-    );
+    const intersects = raycaster.intersectObjects(getClickableMeshes(), false);
 
     if (intersects.length > 0) {
       const intersectedObject = intersects[0].object;
@@ -370,10 +359,7 @@ export function initAnimation(config) {
 
     // Update raycaster
     raycaster.setFromCamera(mouse, camera);
-    const intersects = raycaster.intersectObjects(
-      getClickableMeshes(),
-      false
-    );
+    const intersects = raycaster.intersectObjects(getClickableMeshes(), false);
 
     if (intersects.length > 0) {
       const clickedObject = intersects[0].object;
@@ -382,14 +368,14 @@ export function initAnimation(config) {
       if (objectType && clickableObjects[objectType]) {
         const config = clickableObjects[objectType];
         console.log(`Clicked on ${config.name}`);
-        console.log('Config:', config);
-        console.log('window.openModal available?', typeof window.openModal);
+        console.log("Config:", config);
+        console.log("window.openModal available?", typeof window.openModal);
 
         // Open modal with entry data
         if (window.openModal) {
           window.openModal(config);
         } else {
-          console.error('window.openModal is not defined!');
+          console.error("window.openModal is not defined!");
         }
       }
     }

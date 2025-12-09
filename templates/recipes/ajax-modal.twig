@@ -4,59 +4,49 @@
 {% set view = craft.app.request.getParam('view') %}
 {% set listTitle = craft.app.request.getParam('listTitle') %}
 
+{# Map view names to category slugs (can be string or array) #}
+{% set categoryMap = {
+  'spicy': 'spicy',
+  'egg': 'egg',
+  'pig': 'meat',
+  'eggplant': ['vegetarian', 'vegan'],
+  'peapod': 'tofu',
+  'garlic': 'garlic'
+} %}
+
 {% if view == 'all' %}
   {# Query all recipes #}
   {% set recipes = craft.entries()
     .section('recipes')
     .all() %}
 
+{% elseif view in categoryMap|keys %}
+  {# Query recipes by category #}
+  {% set categorySlugs = categoryMap[view] %}
+  {% set query = craft.entries().section('recipes') %}
+
+  {% if categorySlugs is iterable and categorySlugs is not string %}
+    {# Multiple categories - use OR logic #}
+    {% set categoryElements = [] %}
+    {% for slug in categorySlugs %}
+      {% set categoryElements = categoryElements|merge([craft.categories().slug(slug).one()]) %}
+    {% endfor %}
+    {% set recipes = query.relatedTo(categoryElements).all() %}
+  {% else %}
+    {# Single category #}
+    {% set recipes = query.relatedTo({
+      targetElement: craft.categories().slug(categorySlugs).one()
+    }).all() %}
+  {% endif %}
+
+{% endif %}
+
+{# Render modal list for all non-detail views #}
+{% if view != 'detail' and recipes is defined %}
   {% include 'recipes/_modal-list' with {
     recipes: recipes,
     listTitle: listTitle
   } %}
-
-{% elseif view == 'spicy' %}
-  {# Query spicy recipes #}
-  {% set recipes = craft.entries()
-    .section('recipes')
-    .relatedTo({
-      targetElement: craft.categories().slug('spicy').one()
-    })
-    .all() %}
-
-  {% include 'recipes/_modal-list' with {
-    recipes: recipes,
-    listTitle: listTitle
-  } %}
-
-{% elseif view == 'egg' %}
-  {# Query egg recipes #}
-  {% set recipes = craft.entries()
-    .section('recipes')
-    .relatedTo({
-      targetElement: craft.categories().slug('egg').one()
-    })
-    .all() %}
-
-  {% include 'recipes/_modal-list' with {
-    recipes: recipes,
-    listTitle: listTitle
-  } %}
-
-{% elseif view == 'garlic' %}
-  {# Query garlic recipes #}
-  {% set recipes = craft.entries()
-    .section('recipes')
-    .relatedTo({
-      targetElement: craft.categories().slug('garlic').one()
-    })
-    .all() %}
-
-  {% include 'recipes/_modal-list' with {
-    recipes: recipes,
-    listTitle: listTitle
-  } %}
-
 {% elseif view == 'detail' %}
   {# Render single recipe detail #}
   {% set recipeId = craft.app.request.getParam('recipeId') %}
