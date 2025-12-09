@@ -171,7 +171,7 @@
 </script>
 
 <script type="module">
-  import { initAnimation } from '/animation.js';
+  import { initAnimation } from '/animation.js?v={{ now|date('U') }}';
 
   console.log('window.openModal exists?', typeof window.openModal);
 
