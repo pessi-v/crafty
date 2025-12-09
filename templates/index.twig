@@ -15,13 +15,9 @@
   {% endblock %}
 {% endembed %}
 
-{% do craft.app.view.registerJsFile('@web/animation.js', {
-  type: 'module'
-}) %}
-
 <script type="module">
-  import { initAnimation } from '/animation.js?v={{ now|date('U') }}';
-  import { initModal } from '/modal.js?v={{ now|date('U') }}';
+  import { initAnimation } from '/animation.js?v={{ '/animation.js'|hash }}';
+  import { initModal } from '/modal.js?v={{ '/modal.js'|hash }}';
 
   // Initialize modal system with AJAX URL
   initModal({

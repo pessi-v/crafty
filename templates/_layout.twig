@@ -14,9 +14,9 @@
 			}
 		</script>
 
-		{% do craft.app.view.registerCssFile('@web/styles.css') %}
-		{% do craft.app.view.registerCssFile('@web/animation.css') %}
-		{% do craft.app.view.registerCssFile('@web/modal.css') %}
+		<link rel="stylesheet" href="/styles.css?v={{ '/styles.css'|hash }}">
+		<link rel="stylesheet" href="/animation.css?v={{ '/animation.css'|hash }}">
+		<link rel="stylesheet" href="/modal.css?v={{ '/modal.css'|hash }}">
 
 		<!--Attribution for 3D objects:
 		Chili Pepper by jeremy [CC-BY] (https://creativecommons.org/licenses/by/3.0/) via Poly Pizza (https://poly.pizza/m/2x3UVYE7D-R)
