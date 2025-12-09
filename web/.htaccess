@@ -35,10 +35,11 @@
 <IfModule mod_rewrite.c>
     RewriteEngine On
 
-    # If the request is not secure
-    RewriteCond %{ENV:HTTPS} !=on
-    # Redirect to the secure version
-    RewriteRule (.*) https://%{HTTP_HOST}/$1 [R=301,L]
+    # Redirect HTTP to HTTPS (for Apache servers)
+    # Check X-Forwarded-Proto header (for Cloudflare/proxies) OR HTTPS status
+    RewriteCond %{HTTP:X-Forwarded-Proto} !https [OR]
+    RewriteCond %{HTTPS} off
+    RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
     # Route 404s to index.php
     RewriteCond %{REQUEST_FILENAME} !-f
