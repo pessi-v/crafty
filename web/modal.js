@@ -3,48 +3,76 @@
 // Store current modal state
 let currentModalState = null;
 let modalConfig = {};
+let isClosing = false; // Flag to prevent immediate reopening after close
 
 // Initialize the modal system
 export function initModal(config) {
+  console.log("modal initiation");
   modalConfig = config;
 
   // Event delegation for dynamically loaded content
-  document.getElementById('modal-inner').addEventListener('click', function(e) {
-    // Handle recipe list item clicks
-    const recipeItem = e.target.closest('.recipe-list-item');
-    if (recipeItem) {
-      const recipeId = recipeItem.getAttribute('data-recipe-id');
-      if (recipeId) {
-        showRecipeDetail(recipeId);
+  document
+    .getElementById("modal-inner")
+    .addEventListener("click", function (e) {
+      // Handle recipe list item clicks
+      const recipeItem = e.target.closest(".recipe-list-item");
+      if (recipeItem) {
+        const recipeId = recipeItem.getAttribute("data-recipe-id");
+        if (recipeId) {
+          showRecipeDetail(recipeId);
+        }
+        return;
       }
-      return;
-    }
 
-    // Handle back button clicks
-    const backButton = e.target.closest('[data-action="back"]');
-    if (backButton) {
-      backToList();
-      return;
-    }
-  });
+      // Handle back button clicks
+      const backButton = e.target.closest('[data-action="back"]');
+      if (backButton) {
+        console.log("modal backbutton");
+        backToList();
+        return;
+      }
+    });
+
+  // !! MODAL CLOSING HANDLED BY MODAL PLUGIN
+  // Close modal when clicking on the overlay (outside modal content)
+  // const modalElement = document.getElementById("recipe-modal");
+  // if (modalElement) {
+  //   modalElement.addEventListener("click", function (e) {
+  //     // Only close if clicking directly on the modal container (the overlay)
+  //     if (e.target === modalElement) {
+  //       console.log("close modal bc of overlay click");
+  //       closeModal();
+  //     }
+  //   });
+  // }
 
   // Make functions available globally
   window.openModal = openModal;
-  window.closeModal = closeModal;
+  // window.closeModal = closeModal; !! HANDLED BY MODAL PLUGIN
   window.showRecipeDetail = showRecipeDetail;
   window.backToList = backToList;
+  window.isModalOpen = isModalOpen;
+}
+
+// Check if modal is currently open or in closing state
+export function isModalOpen() {
+  if (isClosing) {
+    return true; // Treat as open during closing transition
+  }
+  const dialog = getModalDialog();
+  return dialog && dialog.shown;
 }
 
 // Get the modal dialog instance
 function getModalDialog() {
-  const modalElement = document.getElementById('recipe-modal');
+  const modalElement = document.getElementById("recipe-modal");
   return modalElement ? modalElement._dialog : null;
 }
 
 // Fetch rendered Twig template via AJAX
 async function fetchModalContent(params) {
   const url = new URL(modalConfig.ajaxUrl);
-  Object.keys(params).forEach(key => {
+  Object.keys(params).forEach((key) => {
     if (params[key] !== undefined && params[key] !== null) {
       url.searchParams.append(key, params[key]);
     }
@@ -52,92 +80,103 @@ async function fetchModalContent(params) {
 
   const response = await fetch(url);
   if (!response.ok) {
-    throw new Error('Failed to load modal content');
+    throw new Error("Failed to load modal content");
   }
   return await response.text();
 }
 
 // Modal functions
 async function openModal(config) {
-  // Prevent opening if modal is already open
+  // Prevent opening if modal is already open or closing
   const dialog = getModalDialog();
-  if (dialog && dialog.shown) {
+  if ((dialog && dialog.shown) || isClosing) {
     return;
   }
 
   // Store the config for back navigation
   currentModalState = {
     config: config,
-    view: 'list'
+    view: "list",
   };
 
   // Display recipe list
-  if (config.type === 'list') {
+  if (config.type === "list") {
     await displayRecipeList(config);
   }
 
   // Show modal using plugin API
   if (dialog) {
+    console.log("opening modal!");
     dialog.show();
   }
 }
 
-function closeModal() {
-  const dialog = getModalDialog();
-  if (dialog) {
-    dialog.hide();
-  }
-  currentModalState = null;
-}
+// function closeModal() {
+//   const dialog = getModalDialog();
+//   if (dialog) {
+//     isClosing = true;
+//     console.log("WE GOT HERE");
+//     dialog.hide();
+
+//     // Add delay before allowing new modals to open (300ms)
+//     setTimeout(() => {
+//       isClosing = false;
+//     }, 300);
+//   }
+//   currentModalState = null;
+// }
 
 async function displayRecipeList(config) {
-  const modalInner = document.getElementById('modal-inner');
+  const modalInner = document.getElementById("modal-inner");
 
   try {
     // Fetch rendered Twig template using the view type from config
     const html = await fetchModalContent({
       view: config.view,
-      listTitle: config.listTitle
+      listTitle: config.listTitle,
     });
 
     modalInner.innerHTML = html;
 
     // Update modal state
-    currentModalState.view = 'list';
+    currentModalState.view = "list";
   } catch (error) {
-    console.error('Error loading recipe list:', error);
-    modalInner.innerHTML = '<p>Error loading recipes. Please try again.</p>';
+    console.error("Error loading recipe list:", error);
+    modalInner.innerHTML = "<p>Error loading recipes. Please try again.</p>";
   }
 }
 
 async function showRecipeDetail(recipeId) {
-  const modalInner = document.getElementById('modal-inner');
+  const modalInner = document.getElementById("modal-inner");
 
   // Show loading state
-  modalInner.innerHTML = '<div style="text-align: center; padding: 40px;">Loading...</div>';
+  modalInner.innerHTML =
+    '<div style="text-align: center; padding: 40px;">Loading...</div>';
 
   try {
     // Fetch rendered Twig template
     const html = await fetchModalContent({
-      view: 'detail',
+      view: "detail",
       recipeId: recipeId,
-      listTitle: currentModalState.config.listTitle
+      listTitle: currentModalState.config.listTitle,
     });
 
     modalInner.innerHTML = html;
 
     // Scroll to top of modal
-    const dialogContent = document.querySelector('#recipe-modal .dialog-content');
+    const dialogContent = document.querySelector(
+      "#recipe-modal .dialog-content"
+    );
     if (dialogContent) {
       dialogContent.scrollTop = 0;
     }
 
     // Update modal state
-    currentModalState.view = 'detail';
+    currentModalState.view = "detail";
     currentModalState.currentRecipeId = recipeId;
   } catch (error) {
-    console.error('Error loading recipe detail:', error);
-    modalInner.innerHTML = '<p>Error loading recipe. Please try again.</p>';
+    console.error("Error loading recipe detail:", error);
+    modalInner.innerHTML = "<p>Error loading recipe. Please try again.</p>";
   }
 }
 

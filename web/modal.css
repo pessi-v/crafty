@@ -1,6 +1,16 @@
 /* Modal content styling */
+.snippets-modal__window {
+  background: #f5f5f0;
+  border: 2px solid #000;
+  border-radius: 8px !important;
+}
+
 .snippets-modal__container {
   z-index: 10000 !important;
+}
+
+.snippets-modal__container .snippets-modal__header {
+  display: none;
 }
 
 .snippets-modal__container .snippets-modal__overlay {
@@ -32,25 +42,28 @@
   background: rgba(255, 255, 255, 0.3);
 }
 
+.snippets-modal__container .snippets-modal__close {
+  display: none;
+}
+
 /* Modal body styling */
-.modal-body {
+.snippets-modal__container {
   line-height: 1.6;
 }
 
-.modal-body h1,
-.modal-body h2,
-.modal-body h3 {
-  margin-top: 1.5em;
+.snippets-modal__container h1,
+.snippets-modal__container h2,
+.snippets-modal__container h3 {
+  /* margin-top: 1.5em; */
   margin-bottom: 0.5em;
-  color: #ffffff;
 }
 
-.modal-body p {
+.snippets-modal__container p {
   margin-bottom: 1em;
 }
 
-.modal-body ul,
-.modal-body ol {
+.snippets-modal__container ul,
+.snippets-modal__container ol {
   margin-left: 20px;
   margin-bottom: 1em;
 }

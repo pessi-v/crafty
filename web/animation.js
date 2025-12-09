@@ -348,6 +348,15 @@ export function initAnimation(config) {
 
   // Mouse move handler for hover effects
   function onMouseMove(event) {
+    // Ignore hover effects if modal is open
+    if (window.isModalOpen && window.isModalOpen()) {
+      if (hoveredObject) {
+        hoveredObject = null;
+        renderer.domElement.classList.remove("pointer");
+      }
+      return;
+    }
+
     // Calculate mouse position in normalized device coordinates
     mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
     mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
@@ -372,6 +381,11 @@ export function initAnimation(config) {
 
   // Click handler
   function onClick(event) {
+    // Ignore clicks if modal is open
+    if (window.isModalOpen && window.isModalOpen()) {
+      return;
+    }
+
     // Calculate mouse position
     mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
     mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;

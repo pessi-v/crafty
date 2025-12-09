@@ -5,7 +5,8 @@
   width: 100vw;
   height: 100vh;
   overflow: hidden;
-  background: linear-gradient(to bottom, #0a0a1a 0%, #1a1a3a 50%, #2a1a3a 100%);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  /* background: linear-gradient(to bottom, #0a0a1a 0%, #1a1a3a 50%, #2a1a3a 100%); */
 }
 
 #animation-container canvas {
