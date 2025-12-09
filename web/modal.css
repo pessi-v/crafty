@@ -64,15 +64,12 @@
 
 .snippets-modal__container ul,
 .snippets-modal__container ol {
-  margin-left: 20px;
-  margin-bottom: 1em;
 }
 
 /* Recipe list styles */
 .recipe-list {
   display: grid;
   gap: 5px;
-  margin-top: 20px;
 }
 
 .recipe-list-item {
@@ -89,4 +86,12 @@
 .modal-back-button::before {
   content: "←";
   font-size: 1.2em;
+}
+
+.recipe-category-tag {
+  border: 1px solid #000;
+  border-radius: 4px;
+  padding-left: 4px;
+  /* padding-left: 4px; */
+  padding-right: 4px;
 }

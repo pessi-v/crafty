@@ -64,10 +64,10 @@ export function initAnimation(config) {
   // Add some stars in the background
   const starGeometry = new THREE.BufferGeometry();
   const starPositions = [];
-  for (let i = 0; i < 1000; i++) {
-    const x = (Math.random() - 0.5) * 100;
-    const y = (Math.random() - 0.5) * 100;
-    const z = (Math.random() - 0.5) * 100;
+  for (let i = 0; i < 30; i++) {
+    const x = (Math.random() - 0.5) * 30;
+    const y = (Math.random() - 0.5) * 30;
+    const z = (Math.random() - 0.5) * 30;
     starPositions.push(x, y, z);
   }
   starGeometry.setAttribute(
