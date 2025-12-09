@@ -1,0 +1,37 @@
+{# Recipe detail view for modal #}
+{# Expected variables: recipe, listTitle #}
+
+<button class="modal-back-button" data-action="back">Back to {{ listTitle }}</button>
+
+<h1 class="modal-title">{{ recipe.title }}</h1>
+
+{% set categories = recipe.recipeCategories.all() %}
+{% if categories|length %}
+  <div style="margin-bottom: 20px;">
+    {% for category in categories %}
+      <span style="display: inline-block; background: rgba(255,255,255,0.1); padding: 5px 15px; border-radius: 15px; margin-right: 10px; font-size: 0.9em;">
+        {{ category.title }}
+      </span>
+    {% endfor %}
+  </div>
+{% endif %}
+
+<div class="modal-body">
+  {% if recipe.recipeContent|length %}
+    {% for block in recipe.recipeContent.all() %}
+      {% if block.type.handle == 'text' %}
+        <p>{{ block.text|nl2br }}</p>
+      {% elseif block.type.handle == 'image' %}
+        {% if block.image|length %}
+          {% for img in block.image.all() %}
+            <img src="{{ img.url }}"
+                 alt="{{ img.title ?? '' }}"
+                 style="max-width: 100%; height: auto; margin: 20px 0; border-radius: 10px;">
+          {% endfor %}
+        {% endif %}
+      {% endif %}
+    {% endfor %}
+  {% else %}
+    <p>No content available</p>
+  {% endif %}
+</div>

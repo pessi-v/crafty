@@ -39,13 +39,13 @@ fieldLayouts:
         name: Content
         uid: a2e98e9f-ffbf-4471-bfae-be97951c9d43
         userCondition: null
-handle: topics
-name: Topics
+handle: labels
+name: Labels
 siteSettings:
   d9505feb-37aa-49c1-a4e1-3ea3bb97a5eb: # receitas
     hasUrls: true
-    template: blog/_topic
-    uriFormat: 'blog/topic/{slug}'
+    template: recipes/_label
+    uriFormat: 'recipes/label/{slug}'
 structure:
   maxLevels: 1
   uid: c92c0968-0d52-4964-b6de-16aa0ab84c39

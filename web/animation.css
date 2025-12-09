@@ -1,0 +1,28 @@
+body {
+  margin: 0;
+  overflow: hidden;
+}
+
+#animation-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background: linear-gradient(
+    to bottom,
+    #0a0a1a 0%,
+    #1a1a3a 50%,
+    #2a1a3a 100%
+  );
+}
+
+#animation-container canvas {
+  display: block;
+  cursor: default;
+}
+
+#animation-container canvas.pointer {
+  cursor: pointer;
+}

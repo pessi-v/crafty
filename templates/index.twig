@@ -1,85 +1,227 @@
 {% extends "_layout.twig" %}
 
 {% block content %}
-<style>
-  body {
-    margin: 0;
-    overflow: hidden;
-  }
-  #animation-container {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    overflow: hidden;
-
-    background: linear-gradient(
-      to bottom,
-      #0a0a1a 0%,
-      #1a1a3a 50%,
-      #2a1a3a 100%
-    );
-
-    /* background-image: linear-gradient(
-      45deg,
-      magenta,
-      rebeccapurple,
-      dodgerblue,
-      green
-    );
-    z-index: -1; */
-    
-  }
-
-  #animation-container canvas {
-    display: block;
-    cursor: default;
-  }
-  #animation-container canvas.pointer {
-    cursor: pointer;
-  }
-
-</style>
 
 <div id="animation-container">
 </div>
+
+{# Recipe Modal using Modal Component plugin #}
+{% embed 'snippets-modal/modal' with {
+  modalId: 'recipe-modal',
+} %}
+  {% block content %}
+    <div id="modal-inner">
+    </div>
+  {% endblock %}
+{% endembed %}
 
 {% do craft.app.view.registerJsFile('@web/animation.js', {
   type: 'module'
 }) %}
 
-<script type="importmap">
-  {
-    "imports": {
-      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
-      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+<script>
+  // Modal functions using Modal Component plugin with AJAX Twig rendering
+  // Store current modal state
+  let currentModalState = null;
+
+  // Get the modal dialog instance
+  function getModalDialog() {
+    const modalElement = document.getElementById('recipe-modal');
+    return modalElement ? modalElement._dialog : null;
+  }
+
+  // Fetch rendered Twig template via AJAX
+  async function fetchModalContent(params) {
+    const url = new URL('{{ siteUrl('recipes/ajax-modal') }}');
+    console.log("bobby: " + "{{ siteUrl}}")
+    console.log("bobby: " + "{{ url('recipes/ajax-modal') }}")
+    Object.keys(params).forEach(key => {
+      if (params[key] !== undefined && params[key] !== null) {
+        url.searchParams.append(key, params[key]);
+      }
+    });
+
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error('Failed to load modal content');
+    }
+    return await response.text();
+  }
+
+  // Modal functions
+  async function openModal(config) {
+    // Prevent opening if modal is already open
+    const dialog = getModalDialog();
+    if (dialog && dialog.shown) {
+      console.log('Modal already open, ignoring click');
+      return;
+    }
+
+    // Store the config for back navigation
+    currentModalState = {
+      config: config,
+      view: 'list'
+    };
+
+    // Display recipe list
+    if (config.type === 'list') {
+      await displayRecipeList(config);
+    }
+
+    // Show modal using plugin API
+    if (dialog) {
+      dialog.show();
     }
   }
+
+  function closeModal() {
+    const dialog = getModalDialog();
+    if (dialog) {
+      dialog.hide();
+    }
+    currentModalState = null;
+  }
+
+  async function displayRecipeList(config) {
+    const modalInner = document.getElementById('modal-inner');
+    // console.log(modalInner)
+
+    // Show loading state
+    // modalInner.innerHTML = '<div style="text-align: center; padding: 40px;">Loading...</div>';
+
+    try {
+      // Fetch rendered Twig template using the view type from config
+      const html = await fetchModalContent({
+        view: config.view,
+        listTitle: config.listTitle
+      });
+
+      modalInner.innerHTML = html;
+
+      // Update modal state
+      currentModalState.view = 'list';
+    } catch (error) {
+      console.error('Error loading recipe list:', error);
+      modalInner.innerHTML = '<p>Error loading recipes. Please try again.</p>';
+    }
+  }
+
+  async function showRecipeDetail(recipeId) {
+    const modalInner = document.getElementById('modal-inner');
+
+    // Show loading state
+    modalInner.innerHTML = '<div style="text-align: center; padding: 40px;">Loading...</div>';
+
+    try {
+      // Fetch rendered Twig template
+      const html = await fetchModalContent({
+        view: 'detail',
+        recipeId: recipeId,
+        listTitle: currentModalState.config.listTitle
+      });
+
+      modalInner.innerHTML = html;
+
+      // Scroll to top of modal
+      const dialogContent = document.querySelector('#recipe-modal .dialog-content');
+      if (dialogContent) {
+        dialogContent.scrollTop = 0;
+      }
+
+      // Update modal state
+      currentModalState.view = 'detail';
+      currentModalState.currentRecipeId = recipeId;
+    } catch (error) {
+      console.error('Error loading recipe detail:', error);
+      modalInner.innerHTML = '<p>Error loading recipe. Please try again.</p>';
+    }
+  }
+
+  function backToList() {
+    if (currentModalState && currentModalState.config) {
+      displayRecipeList(currentModalState.config);
+    }
+  }
+
+  // Event delegation for dynamically loaded content
+  document.getElementById('modal-inner').addEventListener('click', function(e) {
+    // Handle recipe list item clicks
+    const recipeItem = e.target.closest('.recipe-list-item');
+    if (recipeItem) {
+      const recipeId = recipeItem.getAttribute('data-recipe-id');
+      if (recipeId) {
+        showRecipeDetail(recipeId);
+      }
+      return;
+    }
+
+    // Handle back button clicks
+    const backButton = e.target.closest('[data-action="back"]');
+    if (backButton) {
+      backToList();
+      return;
+    }
+  });
+
+  // Make functions available globally
+  window.openModal = openModal;
+  window.closeModal = closeModal;
+  window.showRecipeDetail = showRecipeDetail;
+  window.backToList = backToList;
 </script>
 
 <script type="module">
-  import { initAnimation } from '/animation.js';
+  import { initAnimation } from '/animation.js?v={{ now|date('U') }}';
+
+  console.log('window.openModal exists?', typeof window.openModal);
 
   // Configuration object with Twig variables
+  console.log("bob: " + "{{ siteUrl }}")
+  console.log("bob: " + "{{ url() }}")
   const animationConfig = {
     baseUrl: "{{ siteUrl }}",
     clickableObjects: {
       turnip: {
-        url: "{{ entry.turnipUrl ?? 'https://example.com/planet' }}",
         name: "Turnip Planet",
+        type: "list",
+        view: "all",
+        listTitle: "All Recipes"
       },
       chili: {
-        url: "{{ entry.chiliUrl ?? 'https://example.com/chili' }}",
         name: "Chili Satellite",
+        type: "list",
+        view: "spicy",
+        listTitle: "Spicy Recipes"
       },
       egg: {
-        url: "{{ entry.eggUrl ?? 'https://example.com/egg' }}",
         name: "Egg Satellite",
+        type: "list",
+        view: "egg",
+        listTitle: "Egg Recipes"
       },
       garlic: {
-        url: "{{ entry.garlicUrl ?? 'https://example.com/garlic' }}",
         name: "Garlic Satellite",
+        type: "list",
+        view: "garlic",
+        listTitle: "Garlic Recipes"
+      },
+      peapod: {
+        name: "Peapod Satellite",
+        type: "list",
+        view: "peapod",
+        listTitle: "Tofu Recipes"
+      },
+      eggplant: {
+        name: "Eggplant Satellite",
+        type: "list",
+        view: "eggplant",
+        listTitle: "Vegan and Vegetarian Recipes"
+      },
+      pig: {
+        name: "Pig Satellite",
+        type: "list",
+        view: "pig",
+        listTitle: "Meat Recipes"
       },
     },
   };

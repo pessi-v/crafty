@@ -2,10 +2,10 @@ defaultPlacement: end
 enableVersioning: true
 entryTypes:
   -
-    uid: 9902f883-4ee4-42b9-b395-d40aa2889539 # Post
-handle: blog
+    uid: 17d277de-e9bd-44e5-b20e-c00f3dfdb89c # Recipe
+handle: recipes
 maxAuthors: 1
-name: Blog
+name: Recipes
 previewTargets:
   -
     label: 'Primary entry page'
@@ -16,6 +16,6 @@ siteSettings:
   d9505feb-37aa-49c1-a4e1-3ea3bb97a5eb: # receitas
     enabledByDefault: true
     hasUrls: true
-    template: blog/_entry.twig
-    uriFormat: 'blog/{slug}'
+    template: recipes/_entry.twig
+    uriFormat: 'recipes/{slug}'
 type: channel

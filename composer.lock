@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1311f0e2a97b22ad699f934cee4efeae",
+    "content-hash": "8cf21a89ca79ef8c0cbb2fd2edd2436f",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -546,6 +546,64 @@
                 "source": "https://github.com/craftcms/server-check"
             },
             "time": "2025-07-23T14:22:43+00:00"
+        },
+        {
+            "name": "craftsnippets/modal-component",
+            "version": "2.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/craft-snippets/Craft-modal-component.git",
+                "reference": "44bddaa3fdca33603b2e4291740251dffaf9e429"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/craft-snippets/Craft-modal-component/zipball/44bddaa3fdca33603b2e4291740251dffaf9e429",
+                "reference": "44bddaa3fdca33603b2e4291740251dffaf9e429",
+                "shasum": ""
+            },
+            "require": {
+                "craftcms/cms": "^5.0.0"
+            },
+            "type": "craft-plugin",
+            "extra": {
+                "name": "Modal component",
+                "class": "craftsnippets\\modalcomponent\\ModalComponent",
+                "handle": "modal-component",
+                "developer": "Piotr Pogorzelski",
+                "changelogUrl": "https://github.com/craft-snippets/Craft-modal-component/blob/master/CHANGELOG.md",
+                "developerUrl": "https://craftsnippets.com/",
+                "documentationUrl": "https://github.com/craft-snippets/Craft-modal-component/blob/master/README.md"
+            },
+            "autoload": {
+                "psr-4": {
+                    "craftsnippets\\modalcomponent\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Piotr Pogorzelski",
+                    "homepage": "https://craftsnippets.com/"
+                }
+            ],
+            "description": "Modal component plugin for Craft CMS",
+            "keywords": [
+                "Craft",
+                "cms",
+                "craft-plugin",
+                "craftcms",
+                "modal",
+                "modal component"
+            ],
+            "support": {
+                "docs": "https://github.com/craft-snippets/Craft-modal-component/blob/master/README.md",
+                "issues": "https://github.com/craft-snippets/Craft-modal-component/issues",
+                "source": "https://github.com/craft-snippets/Craft-modal-component/tree/2.0.1"
+            },
+            "time": "2024-07-14T12:38:27+00:00"
         },
         {
             "name": "creocoder/yii2-nested-sets",
