@@ -99,9 +99,11 @@ async function openModal(config) {
     view: "list",
   };
 
-  // Display recipe list
+  // Display recipe list or form
   if (config.type === "list") {
     await displayRecipeList(config);
+  } else if (config.type === "form") {
+    await displayForm(config);
   }
 
   // Show modal using plugin API
@@ -143,6 +145,102 @@ async function displayRecipeList(config) {
   } catch (error) {
     console.error("Error loading recipe list:", error);
     modalInner.innerHTML = "<p>Error loading recipes. Please try again.</p>";
+  }
+}
+
+async function displayForm(config) {
+  const modalInner = document.getElementById("modal-inner");
+
+  try {
+    // Fetch the form page content
+    const response = await fetch(config.url);
+    if (!response.ok) {
+      throw new Error("Failed to load form");
+    }
+    const html = await response.text();
+
+    // Extract just the form content (not the full page)
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+    const formContainer = doc.querySelector('.recipe-submit-container');
+
+    if (formContainer) {
+      modalInner.innerHTML = formContainer.outerHTML;
+
+      // Re-attach event listeners for dynamic content blocks
+      reattachFormListeners();
+    } else {
+      modalInner.innerHTML = html; // Fallback to full content
+    }
+
+    // Update modal state
+    currentModalState.view = "form";
+  } catch (error) {
+    console.error("Error loading form:", error);
+    modalInner.innerHTML = "<p>Error loading form. Please try again.</p>";
+  }
+}
+
+function reattachFormListeners() {
+  let blockCounter = 0;
+
+  const addTextBlockBtn = document.getElementById('add-text-block');
+  const addImageBlockBtn = document.getElementById('add-image-block');
+
+  if (addTextBlockBtn) {
+    addTextBlockBtn.addEventListener('click', function() {
+      blockCounter++;
+      const container = document.getElementById('content-blocks');
+      const blockDiv = document.createElement('div');
+      blockDiv.className = 'content-block';
+      blockDiv.style.cssText = 'margin-bottom: 1rem; padding: 1rem; border: 1px solid #ddd; border-radius: 4px; position: relative;';
+      blockDiv.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+          <strong>Text Block</strong>
+          <button type="button" class="remove-block" style="background: #dc3545; color: white; border: none; padding: 0.25rem 0.5rem; border-radius: 4px; cursor: pointer;">Remove</button>
+        </div>
+        <input type="hidden" name="contentBlocks[${blockCounter}][type]" value="text">
+        <textarea
+          name="contentBlocks[${blockCounter}][text]"
+          rows="4"
+          style="width: 100%; padding: 0.5rem; border: 1px solid #ccc; border-radius: 4px;"
+          placeholder="Enter text content..."
+        ></textarea>
+      `;
+      container.appendChild(blockDiv);
+
+      blockDiv.querySelector('.remove-block').addEventListener('click', function() {
+        blockDiv.remove();
+      });
+    });
+  }
+
+  if (addImageBlockBtn) {
+    addImageBlockBtn.addEventListener('click', function() {
+      blockCounter++;
+      const container = document.getElementById('content-blocks');
+      const blockDiv = document.createElement('div');
+      blockDiv.className = 'content-block';
+      blockDiv.style.cssText = 'margin-bottom: 1rem; padding: 1rem; border: 1px solid #ddd; border-radius: 4px; position: relative;';
+      blockDiv.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+          <strong>Image Block</strong>
+          <button type="button" class="remove-block" style="background: #dc3545; color: white; border: none; padding: 0.25rem 0.5rem; border-radius: 4px; cursor: pointer;">Remove</button>
+        </div>
+        <input type="hidden" name="contentBlocks[${blockCounter}][type]" value="image">
+        <input
+          type="file"
+          name="contentBlocks[${blockCounter}][image]"
+          accept="image/*"
+          style="width: 100%; padding: 0.5rem; border: 1px solid #ccc; border-radius: 4px;"
+        >
+      `;
+      container.appendChild(blockDiv);
+
+      blockDiv.querySelector('.remove-block').addEventListener('click', function() {
+        blockDiv.remove();
+      });
+    });
   }
 }
 
