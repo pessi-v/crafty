@@ -2,7 +2,7 @@
 {# Expected variables: recipes, listTitle #}
 
 <h2 class="modal-title">{{ listTitle }}</h2>
-<div class="recipe-list">
+{# <div class="recipe-list"> #}
   {% if recipes|length %}
     <ul>
       {% for recipe in recipes %}
@@ -21,4 +21,4 @@
   {% else %}
     <p>No recipes found</p>
   {% endif %}
-</div>
+{# </div> #}
