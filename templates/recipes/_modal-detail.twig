@@ -7,11 +7,11 @@
 
 {% set categories = recipe.recipeCategories.all() %}
 {% if categories|length %}
-  <div style="margin-bottom: 20px;">
+  <div class="recipe-categories">
     {% for category in categories %}
-      <span style="display: inline-block; background: rgba(255,255,255,0.1); padding: 5px 15px; border-radius: 15px; margin-right: 10px; font-size: 0.9em;">
+      <div class="recipe-category-tag">
         {{ category.title }}
-      </span>
+      </div>
     {% endfor %}
   </div>
 {% endif %}

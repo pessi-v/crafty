@@ -113,21 +113,6 @@ async function openModal(config) {
   }
 }
 
-// function closeModal() {
-//   const dialog = getModalDialog();
-//   if (dialog) {
-//     isClosing = true;
-//     console.log("WE GOT HERE");
-//     dialog.hide();
-
-//     // Add delay before allowing new modals to open (300ms)
-//     setTimeout(() => {
-//       isClosing = false;
-//     }, 300);
-//   }
-//   currentModalState = null;
-// }
-
 async function displayRecipeList(config) {
   const modalInner = document.getElementById("modal-inner");
 
@@ -162,13 +147,10 @@ async function displayForm(config) {
     // Extract just the form content (not the full page)
     const parser = new DOMParser();
     const doc = parser.parseFromString(html, "text/html");
-    const formContainer = doc.querySelector(".recipe-submit-container");
+    const formContainer = doc.querySelector("#recipe-submit-container");
 
     if (formContainer) {
       modalInner.innerHTML = formContainer.outerHTML;
-
-      // Re-attach event listeners for dynamic content blocks
-      // reattachFormLxisteners();
 
       // Attach form submission handler
       attachFormSubmissionHandler();
@@ -189,7 +171,7 @@ function attachFormSubmissionHandler() {
   const form = document.getElementById("recipe-form");
   if (!form) return;
 
-  form.addEventListener("submit", async function(e) {
+  form.addEventListener("submit", async function (e) {
     e.preventDefault();
 
     // Get form data
@@ -207,8 +189,8 @@ function attachFormSubmissionHandler() {
         method: "POST",
         body: formData,
         headers: {
-          "Accept": "application/json"
-        }
+          Accept: "application/json",
+        },
       });
 
       const result = await response.json();
@@ -230,7 +212,9 @@ function attachFormSubmissionHandler() {
         form.reset();
 
         // Scroll to top of modal to show message
-        const dialogContent = document.querySelector("#recipe-modal .snippets-modal__content");
+        const dialogContent = document.querySelector(
+          "#recipe-modal .snippets-modal__content"
+        );
         if (dialogContent) {
           dialogContent.scrollTop = 0;
         }
@@ -238,11 +222,14 @@ function attachFormSubmissionHandler() {
         // Show error message
         const errorMessage = document.createElement("div");
         errorMessage.className = "error";
-        errorMessage.textContent = result.error || "An error occurred. Please try again.";
+        errorMessage.textContent =
+          result.error || "An error occurred. Please try again.";
         form.insertBefore(errorMessage, form.firstChild);
 
         // Scroll to top of modal to show message
-        const dialogContent = document.querySelector("#recipe-modal .snippets-modal__content");
+        const dialogContent = document.querySelector(
+          "#recipe-modal .snippets-modal__content"
+        );
         if (dialogContent) {
           dialogContent.scrollTop = 0;
         }
@@ -265,72 +252,6 @@ function attachFormSubmissionHandler() {
     }
   });
 }
-
-// function reattachFormListeners() {
-//   let blockCounter = 0;
-
-//   const addTextBlockBtn = document.getElementById("add-text-block");
-//   const addImageBlockBtn = document.getElementById("add-image-block");
-
-// if (addTextBlockBtn) {
-//   addTextBlockBtn.addEventListener("click", function () {
-//     blockCounter++;
-//     const container = document.getElementById("content-blocks");
-//     const blockDiv = document.createElement("div");
-//     blockDiv.className = "content-block";
-//     blockDiv.style.cssText =
-//       "margin-bottom: 1rem; padding: 1rem; border: 1px solid #ddd; border-radius: 4px; position: relative;";
-//     blockDiv.innerHTML = `
-//       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-//         <strong>Text Block</strong>
-//         <button type="button" class="remove-block" style="background: #dc3545; color: white; border: none; padding: 0.25rem 0.5rem; border-radius: 4px; cursor: pointer;">Remove</button>
-//       </div>
-//       <input type="hidden" name="contentBlocks[${blockCounter}][type]" value="text">
-//       <textarea
-//         name="contentBlocks[${blockCounter}][text]"
-//         rows="4"
-//         style="width: 100%; padding: 0.5rem; border: 1px solid #ccc; border-radius: 4px;"
-//         placeholder="Enter text content..."
-//       ></textarea>
-//     `;
-//     container.appendChild(blockDiv);
-
-//     blockDiv
-//       .querySelector(".remove-block")
-//       .addEventListener("click", function () {
-//         blockDiv.remove();
-//       });
-//   });
-// }
-
-// if (addImageBlockBtn) {
-//   addImageBlockBtn.addEventListener('click', function() {
-//     blockCounter++;
-//     const container = document.getElementById('content-blocks');
-//     const blockDiv = document.createElement('div');
-//     blockDiv.className = 'content-block';
-//     blockDiv.style.cssText = 'margin-bottom: 1rem; padding: 1rem; border: 1px solid #ddd; border-radius: 4px; position: relative;';
-//     blockDiv.innerHTML = `
-//       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-//         <strong>Image Block</strong>
-//         <button type="button" class="remove-block" style="background: #dc3545; color: white; border: none; padding: 0.25rem 0.5rem; border-radius: 4px; cursor: pointer;">Remove</button>
-//       </div>
-//       <input type="hidden" name="contentBlocks[${blockCounter}][type]" value="image">
-//       <input
-//         type="file"
-//         name="contentBlocks[${blockCounter}][image]"
-//         accept="image/*"
-//         style="width: 100%; padding: 0.5rem; border: 1px solid #ccc; border-radius: 4px;"
-//       >
-//     `;
-//     container.appendChild(blockDiv);
-
-//     blockDiv.querySelector('.remove-block').addEventListener('click', function() {
-//       blockDiv.remove();
-//     });
-//   });
-// }
-// }
 
 async function showRecipeDetail(recipeId) {
   const modalInner = document.getElementById("modal-inner");

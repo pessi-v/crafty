@@ -36,7 +36,7 @@
 
 body {
   /* 4. Add accessible line-height */
-  line-height: 1.5;
+  line-height: 1.4;
   /* 5. Improve text rendering */
   -webkit-font-smoothing: antialiased;
 }
@@ -57,6 +57,10 @@ button,
 textarea,
 select {
   font: inherit;
+}
+
+textarea {
+  resize: none;
 }
 
 /* 8. Avoid text overflows */
@@ -101,7 +105,6 @@ h6 {
 body {
   color: var(--color-base);
   font-family: var(--type-system-ui);
-  line-height: 1.5;
   margin: 0;
   overflow: hidden;
   padding: var(--layout-site-gutter)

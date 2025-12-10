@@ -1,8 +1,8 @@
 {% extends "_layout" %}
 
 {% block content %}
-<div class="recipe-submit-container">
-  <h1>Submit a Recipe</h1>
+<div id="recipe-submit-container" class="flex-column">
+  <h1 class="modal-title">Submit a Recipe</h1>
 
   {% if craft.app.session.hasFlash('notice') %}
     <div class="notice">
@@ -20,77 +20,70 @@
     {{ csrfInput() }}
     {{ actionInput('recipesmodule/recipes/submit') }}
 
-    <div class="form-group">
-      <label for="title" class="form-label">
-        Recipe Title
-      </label>
-      <input
-        type="text"
-        id="title"
-        name="title"
-        required
-        autocomplete="off"
-        class="form-input"
-      >
-    </div>
-
-    <div class="form-group">
-      <label class="form-label">Categories</label>
-      {% set allCategories = craft.categories().group('labels').all() %}
-      <div class="categories-container">
-        {% for category in allCategories %}
-          <label class="category-checkbox-label">
-            <input
-              type="checkbox"
-              name="categories[]"
-              value="{{ category.id }}"
-            >
-            {{ category.title }}
-          </label>
-        {% endfor %}
+    <div class="flex-column">
+      <div class="form-group">
+        <label for="title" class="form-label">
+          Title
+        </label>
+        <input
+          type="text"
+          id="title"
+          name="title"
+          required
+          autocomplete="off"
+          class="form-input"
+        >
       </div>
-    </div>
 
-    <div class="form-group">
-      <label class="form-label">Recipe Content</label>
-      <div id="content-blocks">
-        {# Content blocks will be added here dynamically #}
+      <div class="form-group">
+        <label class="form-label">Categories</label>
+        {% set allCategories = craft.categories().group('labels').all() %}
+        <div class="categories-container">
+          {% for category in allCategories %}
+            <label class="category-checkbox-label">
+              <input
+                type="checkbox"
+                name="categories[]"
+                value="{{ category.id }}"
+              >
+              {{ category.title }}
+            </label>
+          {% endfor %}
+        </div>
       </div>
-    
-      <div class="content-block-header">
-        {# <strong>Text Block</strong> #}
-      {# <button type="button" class="remove-block" style="background: #dc3545; color: white; border: none; padding: 0.25rem 0.5rem; border-radius: 4px; cursor: pointer;">Remove</button> #}
+
+      <div class="form-group">
+        <label class="form-label">Recipe Content</label>
+        <input type="hidden" name="contentBlocks[0][text]" value="text">
+        <textarea
+          name="contentBlocks[0][text]"
+          rows="4"
+          class="form-input"
+        ></textarea>
       </div>
-      <input type="hidden" name="contentBlocks[0][text]" value="text">
-      <textarea
-        name="contentBlocks[0][text]"
-        rows="4"
-        class="form-input"
-        placeholder="Enter text content..."
-      ></textarea>
-    </div>
 
-    <div class="form-group">
-      <label for="salasana" class="form-label">
-        Password
-      </label>
-      <input
-        type="salasana"
-        id="salasana"
-        name="salasana"
-        required
-        autocomplete="off"
-        class="form-input"
-      >
-      <small class="form-helper-text">Enter the submission password</small>
-    </div>
+      <div class="form-group">
+        <label for="salasana" class="form-label">
+          Password
+        </label>
+        <input
+          type="salasana"
+          id="salasana"
+          name="salasana"
+          required
+          autocomplete="off"
+          class="form-input"
+        >
 
-    <button type="submit" class="submit-button">
-      Submit Recipe
-    </button>
-    <p class="form-note">
-      <em>Note: Your recipe will be reviewed before it appears on the site.</em>
-    </p>
+      </div>
+
+      <button type="submit" class="submit-button">
+        Submit
+      </button>
+      <p class="form-note">
+        <em>Your recipe will be reviewed before it appears on the site.</em>
+      </p>
+    </div>
   </form>
 </div>
 
