@@ -25,7 +25,7 @@ class RecipesController extends Controller
         $correctPassword = App::env('RECIPE_SUBMIT_PASSWORD');
 
         // Validate password
-        $submittedPassword = Craft::$app->request->getBodyParam('password');
+        $submittedPassword = Craft::$app->request->getBodyParam('salasana');
         if ($submittedPassword !== $correctPassword) {
             if (Craft::$app->request->getAcceptsJson()) {
                 return $this->asJson([
