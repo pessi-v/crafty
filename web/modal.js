@@ -169,6 +169,9 @@ async function displayForm(config) {
 
       // Re-attach event listeners for dynamic content blocks
       // reattachFormLxisteners();
+
+      // Attach form submission handler
+      attachFormSubmissionHandler();
     } else {
       modalInner.innerHTML = html; // Fallback to full content
     }
@@ -179,6 +182,88 @@ async function displayForm(config) {
     console.error("Error loading form:", error);
     modalInner.innerHTML = "<p>Error loading form. Please try again.</p>";
   }
+}
+
+// Handle form submission via AJAX
+function attachFormSubmissionHandler() {
+  const form = document.getElementById("recipe-form");
+  if (!form) return;
+
+  form.addEventListener("submit", async function(e) {
+    e.preventDefault();
+
+    // Get form data
+    const formData = new FormData(form);
+
+    // Show loading state on submit button
+    const submitButton = form.querySelector('button[type="submit"]');
+    const originalButtonText = submitButton.textContent;
+    submitButton.disabled = true;
+    submitButton.textContent = "Submitting...";
+
+    try {
+      // Submit form via AJAX
+      const response = await fetch(form.action, {
+        method: "POST",
+        body: formData,
+        headers: {
+          "Accept": "application/json"
+        }
+      });
+
+      const result = await response.json();
+
+      // Remove any existing messages
+      const existingNotice = form.querySelector(".notice");
+      const existingError = form.querySelector(".error");
+      if (existingNotice) existingNotice.remove();
+      if (existingError) existingError.remove();
+
+      if (result.success) {
+        // Show success message
+        const successMessage = document.createElement("div");
+        successMessage.className = "notice";
+        successMessage.textContent = result.message;
+        form.insertBefore(successMessage, form.firstChild);
+
+        // Clear form fields
+        form.reset();
+
+        // Scroll to top of modal to show message
+        const dialogContent = document.querySelector("#recipe-modal .snippets-modal__content");
+        if (dialogContent) {
+          dialogContent.scrollTop = 0;
+        }
+      } else {
+        // Show error message
+        const errorMessage = document.createElement("div");
+        errorMessage.className = "error";
+        errorMessage.textContent = result.error || "An error occurred. Please try again.";
+        form.insertBefore(errorMessage, form.firstChild);
+
+        // Scroll to top of modal to show message
+        const dialogContent = document.querySelector("#recipe-modal .snippets-modal__content");
+        if (dialogContent) {
+          dialogContent.scrollTop = 0;
+        }
+      }
+    } catch (error) {
+      console.error("Error submitting form:", error);
+
+      // Show error message
+      const existingError = form.querySelector(".error");
+      if (existingError) existingError.remove();
+
+      const errorMessage = document.createElement("div");
+      errorMessage.className = "error";
+      errorMessage.textContent = "An error occurred. Please try again.";
+      form.insertBefore(errorMessage, form.firstChild);
+    } finally {
+      // Restore submit button
+      submitButton.disabled = false;
+      submitButton.textContent = originalButtonText;
+    }
+  });
 }
 
 // function reattachFormListeners() {
