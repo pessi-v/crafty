@@ -89,8 +89,17 @@ RUN mkdir -p /var/www/html/storage/runtime \
 # Install composer dependencies as www-data user
 RUN su www-data -s /bin/sh -c "composer install --no-dev --optimize-autoloader --no-interaction"
 
+# Create static directory and set permissions
+RUN mkdir -p /var/www/html/web/static/dist \
+    && chown -R www-data:www-data /var/www/html/web/static
+
 # Install npm dependencies and build assets as www-data user
-RUN su www-data -s /bin/sh -c "npm install && npm run build"
+RUN su www-data -s /bin/sh -c "cd /var/www/html && npm install && npm run build"
+
+# Verify that build artifacts exist
+RUN ls -la /var/www/html/web/static/dist/ && \
+    test -f /var/www/html/web/static/dist/manifest.json || \
+    (echo "ERROR: Build failed - manifest.json not found!" && exit 1)
 
 # Create a simple entrypoint script to ensure permissions on startup
 RUN echo '#!/bin/sh' > /docker-entrypoint.sh \
