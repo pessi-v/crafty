@@ -104,7 +104,10 @@ info "restarting with new Dockerimage"
 docker compose up -d
 
 info "Installing Composer dependencies (production mode)..."
-docker compose exec -T --user www-data php composer install --no-dev --optimize-autoloader --no-interaction
+docker compose exec -T --user www-data php composer install --no-dev --optimize-autoloader --no-interaction || echo "WARNING: Composer install had non-zero exit"
+
+info "DEBUG: About to check Node.js..."
+echo "DEBUG: Still running after composer install"
 
 info "Checking Node.js installation..."
 which node || echo "ERROR: Node.js not found!"
