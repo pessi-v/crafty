@@ -41,7 +41,9 @@ export function initModal(config) {
     .getElementById("modal-inner")
     .addEventListener("click", function (e) {
       // Handle category tag and category card clicks
-      const categoryElement = e.target.closest(".recipe-category-tag, .category-card");
+      const categoryElement = e.target.closest(
+        ".recipe-category-tag, .category-card"
+      );
       if (categoryElement) {
         e.stopPropagation(); // Prevent triggering recipe item click
         const categorySlug = categoryElement.getAttribute("data-category-slug");
@@ -298,8 +300,8 @@ async function showRecipeDetail(recipeId, recipeSlug) {
   const modalInner = document.getElementById("modal-inner");
 
   // Show loading state
-  modalInner.innerHTML =
-    '<div style="text-align: center; padding: 40px;">Loading...</div>';
+  // modalInner.innerHTML =
+  //   '<div style="text-align: center; padding: 40px;">Loading...</div>';
 
   try {
     // Fetch rendered Twig template
@@ -345,8 +347,8 @@ async function showRecipeDetailBySlug(recipeSlug) {
   const modalInner = document.getElementById("modal-inner");
 
   // Show loading state
-  modalInner.innerHTML =
-    '<div style="text-align: center; padding: 40px;">Loading...</div>';
+  // modalInner.innerHTML =
+  //   '<div style="text-align: center; padding: 40px;">Loading...</div>';
 
   try {
     // Fetch rendered Twig template using slug
@@ -385,9 +387,7 @@ async function showRecipeDetailBySlug(recipeSlug) {
 async function openCategoryModal(categorySlug) {
   // Generate title from category slug (capitalize first letter)
   const title =
-    categorySlug.charAt(0).toUpperCase() +
-    categorySlug.slice(1) +
-    " Recipes";
+    categorySlug.charAt(0).toUpperCase() + categorySlug.slice(1) + " Recipes";
 
   const config = {
     type: "list",
@@ -520,7 +520,8 @@ async function restoreModalFromURL() {
     config = {
       type: "list",
       view: cravings,
-      listTitle: cravings.charAt(0).toUpperCase() + cravings.slice(1) + " Recipes",
+      listTitle:
+        cravings.charAt(0).toUpperCase() + cravings.slice(1) + " Recipes",
     };
   }
 
