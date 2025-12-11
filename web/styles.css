@@ -12,8 +12,8 @@
     "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
   --type-technical: monospace;
   --cursor-default: url("cursor_empty.png"), auto;
-  --cursor-pointer: url("cursor_blue.png"), auto;
-  /* --cursor-pointer: url("cursor_black.png"), auto; */
+  /* --cursor-pointer: url("cursor_blue.png"), auto; */
+  --cursor-pointer: url("cursor_black.png"), auto;
   --cursor-click: url("cursor_blue.png"), auto;
 }
 

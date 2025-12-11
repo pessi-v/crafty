@@ -5,7 +5,7 @@
   <button class="modal-back-button" data-action="back">Back to {{ listTitle }}</button>
 {% endif %}
 
-<h1 class="modal-title">{{ recipe.title }}</h1>
+<h2 class="capitalize text-4xl">{{ recipe.title }}</h2>
 
 {% set categories = recipe.recipeCategories.all() %}
 {% if categories|length %}

@@ -3,79 +3,92 @@
     position: absolute;
     left: 50px;
     bottom: 50px;
-    opacity: 0.75;
+    /* opacity: 0.75; */
     width: 100px;
-    height: 100px;
-    background: #f5f5f0;
-    border: 2px solid #000;
-    border-radius: 8px;
+    height: 85px;
+    /* background: #f5f5f0; */
+    border: 4px solid #000;
+    border-radius: 20px;
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    --color-btn-accent: #405ab0ff;
+    color: black;
+    cursor: var(--cursor-pointer);
+
+    /* reset */
+    line-height: 0 !important;
   }
 
-  .play-pause-section {
-    flex: 2;
+  .radio-widget__play-pause {
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-grow: 4;
+    cursor: var(--cursor-pointer);
+
+    /* reset */
+    line-height: 0 !important;
   }
 
-  .channel-section {
-    flex: 1;
-    display: flex;
-    border-top: 2px solid #000;
+  .radio-widget__play-pause-btn:active {
+    cursor: var(--cursor-click);
   }
 
-  button {
-    background: #f5f5f0;
-    border: none;
-    /* cursor: pointer; */
-    /* cursor: url("cursor_blue.png"), auto; */
-    /* cursor: var(--cursor-pointer); */
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    font-weight: 600;
-    transition: transform 0.1s ease;
-  }
-
-  button:active {
-    transform: scale(0.95);
-  }
-
-  .play-pause-btn {
+  .radio-widget__play-pause-btn {
     width: 100%;
     height: 100%;
     font-size: 40px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-weight: 600;
+    transition: transform 0.1s ease;
+    cursor: var(--cursor-pointer);
   }
 
-  .channel-btn {
+  .radio-widget__play-pause-btn.playing {
+    background: var(--color-btn-accent);
+  }
+
+  .radio-widget__channels {
+    display: flex;
+    border-top: 4px solid #000;
+    flex-grow: 2;
+    cursor: var(--cursor-pointer);
+
+    /* reset */
+    line-height: 0 !important;
+  }
+
+  .radio-widget__channels-btn:active {
+    cursor: var(--cursor-click);
+  }
+
+  .radio-widget__channels-btn {
     flex: 1;
     font-size: 12px;
-    border-right: 2px solid #000;
+    font-weight: bold;
+    border-right: 4px solid #000;
+    cursor: var(--cursor-pointer);
   }
 
-  .channel-btn:last-child {
+  .radio-widget__channels-btn:last-child {
     border-right: none;
   }
 
-  .channel-btn.active {
-    background: #ddd;
-  }
-
-  .play-pause-btn.playing {
-    background: #e8e8e0;
+  .radio-widget__channels-btn.active {
+    background: var(--color-btn-accent);
   }
 </style>
 
 
 <div class="radio-widget">
-  <div class="play-pause-section">
-    <button class="play-pause-btn" id="playPauseBtn">▶</button>
+  <div class="radio-widget__play-pause">
+    <button class="radio-widget__play-pause-btn" id="playPauseBtn">▶</button>
   </div>
-  <div class="channel-section">
-    <button class="radio channel-btn active" data-channel="1">1</button>
-    <button class="radio channel-btn" data-channel="2">2</button>
-    <button class="radio channel-btn" data-channel="3">3</button>
+  <div class="radio-widget__channels">
+    <button class="radio radio-widget__channels-btn active" data-channel="1">1</button>
+    <button class="radio radio-widget__channels-btn" data-channel="2">2</button>
+    <button class="radio radio-widget__channels-btn" data-channel="3">3</button>
   </div>
 </div>
 
@@ -92,7 +105,7 @@
   let isPlaying = false;
 
   const playPauseBtn = document.getElementById('playPauseBtn');
-  const channelBtns = document.querySelectorAll('.channel-btn');
+  const channelBtns = document.querySelectorAll('.radio-widget__channels-btn');
 
   function initSound() {
     if (!sound) {

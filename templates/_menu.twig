@@ -1,16 +1,25 @@
 <style>
+  .hamburger-menu:active {
+    cursor: var(--cursor-click);
+  }
+
   .hamburger-menu {
     position: absolute;
     top: 45px;
     right: 50px;
     z-index: 10;
-    cursor: url("cursor_blue.png"), pointer;
+    cursor: var(--cursor-pointer);
+  }
+
+  .menu:active {
+    cursor: var(--cursor-click);
   }
 
   .menu {
     width: 100px;
     height: 100px;
     /* color: white; */
+    cursor: var(--cursor-pointer);
   }
 </style>
 

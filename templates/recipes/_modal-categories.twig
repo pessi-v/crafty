@@ -1,13 +1,13 @@
 {# All categories view for modal #}
 {# Expected variables: categories, listTitle #}
 
-<h1 class="modal-title">{{ listTitle }}</h1>
+<h2 class="capitalize text-4xl">{{ listTitle }}</h2>
 
 {% if categories|length %}
-  <div class="categories-grid">
+  <div class="categories-modal__categories">
     {% for category in categories %}
       <div class="recipe-category-tag clickable" data-category-slug="{{ category.slug }}">
-        <h3>{{ category.title }}</h3>
+        {{ category.title }}
       </div>
     {% endfor %}
   </div>

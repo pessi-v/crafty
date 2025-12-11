@@ -42,10 +42,6 @@
   list-style-type: disc;
 }
 
-.modal-title {
-  text-transform: capitalize;
-}
-
 .recipe-list-item {
   /* cursor: pointer; */
 }
