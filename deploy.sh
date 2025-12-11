@@ -106,6 +106,12 @@ docker compose up -d
 info "Installing Composer dependencies (production mode)..."
 docker compose exec -T --user www-data php composer install --no-dev --optimize-autoloader --no-interaction
 
+info "Checking Node.js installation..."
+which node || echo "ERROR: Node.js not found!"
+node --version || echo "ERROR: Cannot run node"
+which npm || echo "ERROR: npm not found!"
+npm --version || echo "ERROR: Cannot run npm"
+
 info "Creating web/static/dist directory..."
 mkdir -p web/static/dist
 
