@@ -80,7 +80,7 @@ handle: recipe
 hasTitleField: true
 icon: pot-food
 name: Recipe
-showSlugField: false
+showSlugField: true
 showStatusField: false
 slugTranslationKeyFormat: null
 slugTranslationMethod: site

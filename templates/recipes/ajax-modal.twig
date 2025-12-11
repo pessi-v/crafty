@@ -1,12 +1,12 @@
 {# AJAX endpoint for rendering modal content #}
-{# Expects: view (all|spicy|detail), recipeId (for detail view), listTitle #}
+{# Expects: view (all|spicy|detail|any-category-slug), recipeId (for detail view), listTitle #}
 
 {% set view = craft.app.request.getParam('view') %}
 {% set listTitle = craft.app.request.getParam('listTitle') %}
 
-{# Map view names to category slugs (can be string or array) #}
+{# Map 3D object view names to category slugs (special cases only) #}
 {% set categoryMap = {
-  'spicy': 'spicy',
+  'chili': 'spicy',
   'egg': 'egg',
   'pig': 'meat',
   'eggplant': ['vegetarian', 'vegan'],
@@ -14,14 +14,20 @@
   'garlic': 'garlicky'
 } %}
 
-{% if view == 'all' %}
+{% if view == 'categories' %}
+  {# Query all categories #}
+  {% set categories = craft.categories()
+    .group('labels')
+    .all() %}
+
+{% elseif view == 'all' %}
   {# Query all recipes #}
   {% set recipes = craft.entries()
     .section('recipes')
     .all() %}
 
 {% elseif view in categoryMap|keys %}
-  {# Query recipes by category #}
+  {# Query recipes by mapped category (for 3D satellites) #}
   {% set categorySlugs = categoryMap[view] %}
   {% set query = craft.entries().section('recipes') %}
 
@@ -39,10 +45,29 @@
     }).all() %}
   {% endif %}
 
+{% else %}
+  {# Generic category query - treat view as category slug #}
+  {% set category = craft.categories().slug(view).one() %}
+  {% if category %}
+    {% set recipes = craft.entries()
+      .section('recipes')
+      .relatedTo({
+        targetElement: category
+      })
+      .all() %}
+  {% else %}
+    {% set recipes = [] %}
+  {% endif %}
+
 {% endif %}
 
-{# Render modal list for all non-detail views #}
-{% if view != 'detail' and recipes is defined %}
+{# Render modal content based on view type #}
+{% if view == 'categories' and categories is defined %}
+  {% include 'recipes/_modal-categories' with {
+    categories: categories,
+    listTitle: listTitle
+  } %}
+{% elseif view != 'detail' and recipes is defined %}
   {% include 'recipes/_modal-list' with {
     recipes: recipes,
     listTitle: listTitle
@@ -50,10 +75,20 @@
 {% elseif view == 'detail' %}
   {# Render single recipe detail #}
   {% set recipeId = craft.app.request.getParam('recipeId') %}
-  {% set recipe = craft.entries()
-    .section('recipes')
-    .id(recipeId)
-    .one() %}
+  {% set recipeSlug = craft.app.request.getParam('recipeSlug') %}
+
+  {# Query by slug first (for URLs), fallback to ID (for internal clicks) #}
+  {% if recipeSlug %}
+    {% set recipe = craft.entries()
+      .section('recipes')
+      .slug(recipeSlug)
+      .one() %}
+  {% elseif recipeId %}
+    {% set recipe = craft.entries()
+      .section('recipes')
+      .id(recipeId)
+      .one() %}
+  {% endif %}
 
   {% if recipe %}
     {% include 'recipes/_modal-detail' with {

@@ -1,17 +1,19 @@
 {# Recipe detail view for modal #}
-{# Expected variables: recipe, listTitle #}
+{# Expected variables: recipe, listTitle (optional) #}
 
-<button class="modal-back-button" data-action="back">Back to {{ listTitle }}</button>
+{% if listTitle %}
+  <button class="modal-back-button" data-action="back">Back to {{ listTitle }}</button>
+{% endif %}
 
 <h1 class="modal-title">{{ recipe.title }}</h1>
 
 {% set categories = recipe.recipeCategories.all() %}
 {% if categories|length %}
-  <div style="margin-bottom: 20px;">
+  <div class="recipe-categories">
     {% for category in categories %}
-      <span style="display: inline-block; background: rgba(255,255,255,0.1); padding: 5px 15px; border-radius: 15px; margin-right: 10px; font-size: 0.9em;">
+      <div class="recipe-category-tag clickable" data-category-slug="{{ category.slug }}">
         {{ category.title }}
-      </span>
+      </div>
     {% endfor %}
   </div>
 {% endif %}

@@ -154,6 +154,17 @@ export function initAnimation(config) {
       rotationZ: 0.005,
       model: null,
     },
+    hamburger: {
+      radius: 5.0,
+      speed: 0.2,
+      tilt: 0.18,
+      yOffset: 0.4,
+      startAngle: Math.PI * 0.9, // ~162 degrees offset
+      rotationX: 0.01,
+      rotationY: 0.008,
+      rotationZ: 0.009,
+      model: null,
+    },
   };
 
   // URL configuration for clickable objects (passed from Twig)
@@ -167,7 +178,7 @@ export function initAnimation(config) {
   // GLTF Loader
   const loader = new GLTFLoader();
   let modelsLoaded = 0;
-  const totalModels = 4;
+  const totalModels = 8;
 
   function onModelLoaded() {
     modelsLoaded++;
@@ -240,6 +251,7 @@ export function initAnimation(config) {
   loadSatellite("pig", 0.005);
   loadSatellite("eggplant", 0.45);
   loadSatellite("peapod", 0.08);
+  loadSatellite("hamburger", 0.1);
 
   // Animation variables
   let time = 0;

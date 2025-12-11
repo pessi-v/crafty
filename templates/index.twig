@@ -10,7 +10,7 @@
   modalId: 'recipe-modal',
 } %}
   {% block content %}
-    <div id="modal-inner">
+    <div id="modal-inner" class="flex-column">
     </div>
   {% endblock %}
 {% endembed %}
@@ -30,14 +30,14 @@
     clickableObjects: {
       turnip: {
         name: "Turnip Planet",
-        type: "list",
-        view: "all",
-        listTitle: "All Recipes"
+        type: "form",
+        url: "{{ siteUrl('recipes/submit') }}",
+        listTitle: "Submit a Recipe"
       },
       chili: {
         name: "Chili Satellite",
         type: "list",
-        view: "spicy",
+        view: "chili",
         listTitle: "Spicy Recipes"
       },
       egg: {
@@ -50,7 +50,7 @@
         name: "Garlic Satellite",
         type: "list",
         view: "garlic",
-        listTitle: "Garlic Recipes"
+        listTitle: "Garlicky Recipes"
       },
       peapod: {
         name: "Peapod Satellite",
@@ -70,10 +70,25 @@
         view: "pig",
         listTitle: "Meat Recipes"
       },
+      hamburger: {
+        name: "Hamburger Satellite",
+        type: "list",
+        view: "categories",
+        listTitle: "All Categories"
+      },
     },
   };
 
   // Initialize the animation
   initAnimation(animationConfig);
+
+  // Add click handler for hamburger menu icon
+  document.getElementById('hamburger-menu-icon').addEventListener('click', function() {
+    window.openModal({
+      type: "list",
+      view: "all",
+      listTitle: "All Recipes"
+    });
+  });
 </script>
 {% endblock %}

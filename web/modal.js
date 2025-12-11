@@ -10,16 +10,56 @@ export function initModal(config) {
   console.log("modal initiation");
   modalConfig = config;
 
+  // Handle browser back/forward buttons
+  window.addEventListener("popstate", function (e) {
+    if (e.state && e.state.modalConfig) {
+      // Restore modal from history state
+      restoreModalFromState(e.state);
+    } else {
+      // No modal state, close modal if open
+      const dialog = getModalDialog();
+      if (dialog && dialog.shown) {
+        dialog.hide();
+      }
+    }
+  });
+
+  // Check URL on page load to restore modal state
+  restoreModalFromURL();
+
+  // Listen for modal close events to reset URL
+  const modalElement = document.getElementById("recipe-modal");
+  if (modalElement) {
+    // Use the plugin's built-in hide event
+    modalElement.addEventListener("hide", function (event) {
+      resetURL();
+    });
+  }
+
   // Event delegation for dynamically loaded content
   document
     .getElementById("modal-inner")
     .addEventListener("click", function (e) {
+      // Handle category tag and category card clicks
+      const categoryElement = e.target.closest(
+        ".recipe-category-tag, .category-card"
+      );
+      if (categoryElement) {
+        e.stopPropagation(); // Prevent triggering recipe item click
+        const categorySlug = categoryElement.getAttribute("data-category-slug");
+        if (categorySlug) {
+          openCategoryModal(categorySlug);
+        }
+        return;
+      }
+
       // Handle recipe list item clicks
       const recipeItem = e.target.closest(".recipe-list-item");
       if (recipeItem) {
+        const recipeSlug = recipeItem.getAttribute("data-recipe-slug");
         const recipeId = recipeItem.getAttribute("data-recipe-id");
-        if (recipeId) {
-          showRecipeDetail(recipeId);
+        if (recipeSlug) {
+          showRecipeDetail(recipeId, recipeSlug);
         }
         return;
       }
@@ -99,9 +139,14 @@ async function openModal(config) {
     view: "list",
   };
 
-  // Display recipe list
+  // Update URL with modal state
+  updateURLForModal(config);
+
+  // Display recipe list or form
   if (config.type === "list") {
     await displayRecipeList(config);
+  } else if (config.type === "form") {
+    await displayForm(config);
   }
 
   // Show modal using plugin API
@@ -110,21 +155,6 @@ async function openModal(config) {
     dialog.show();
   }
 }
-
-// function closeModal() {
-//   const dialog = getModalDialog();
-//   if (dialog) {
-//     isClosing = true;
-//     console.log("WE GOT HERE");
-//     dialog.hide();
-
-//     // Add delay before allowing new modals to open (300ms)
-//     setTimeout(() => {
-//       isClosing = false;
-//     }, 300);
-//   }
-//   currentModalState = null;
-// }
 
 async function displayRecipeList(config) {
   const modalInner = document.getElementById("modal-inner");
@@ -146,12 +176,132 @@ async function displayRecipeList(config) {
   }
 }
 
-async function showRecipeDetail(recipeId) {
+async function displayForm(config) {
+  const modalInner = document.getElementById("modal-inner");
+
+  try {
+    // Fetch the form page content
+    const response = await fetch(config.url);
+    if (!response.ok) {
+      throw new Error("Failed to load form");
+    }
+    const html = await response.text();
+
+    // Extract just the form content (not the full page)
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, "text/html");
+    const formContainer = doc.querySelector("#recipe-submit-container");
+
+    if (formContainer) {
+      modalInner.innerHTML = formContainer.outerHTML;
+
+      // Attach form submission handler
+      attachFormSubmissionHandler();
+    } else {
+      modalInner.innerHTML = html; // Fallback to full content
+    }
+
+    // Update modal state
+    currentModalState.view = "form";
+  } catch (error) {
+    console.error("Error loading form:", error);
+    modalInner.innerHTML = "<p>Error loading form. Please try again.</p>";
+  }
+}
+
+// Handle form submission via AJAX
+function attachFormSubmissionHandler() {
+  const form = document.getElementById("recipe-form");
+  if (!form) return;
+
+  form.addEventListener("submit", async function (e) {
+    e.preventDefault();
+
+    // Get form data
+    const formData = new FormData(form);
+
+    // Show loading state on submit button
+    const submitButton = form.querySelector('button[type="submit"]');
+    const originalButtonText = submitButton.textContent;
+    submitButton.disabled = true;
+    submitButton.textContent = "Submitting...";
+
+    try {
+      // Submit form via AJAX
+      const response = await fetch(form.action, {
+        method: "POST",
+        body: formData,
+        headers: {
+          Accept: "application/json",
+        },
+      });
+
+      const result = await response.json();
+
+      // Remove any existing messages
+      const existingNotice = form.querySelector(".notice");
+      const existingError = form.querySelector(".error");
+      if (existingNotice) existingNotice.remove();
+      if (existingError) existingError.remove();
+
+      if (result.success) {
+        // Show success message
+        const successMessage = document.createElement("div");
+        successMessage.className = "notice";
+        successMessage.textContent = result.message;
+        form.insertBefore(successMessage, form.firstChild);
+
+        // Clear form fields
+        form.reset();
+
+        // Scroll to top of modal to show message
+        const dialogContent = document.querySelector(
+          "#recipe-modal .snippets-modal__content"
+        );
+        if (dialogContent) {
+          dialogContent.scrollTop = 0;
+        }
+      } else {
+        // Show error message
+        const errorMessage = document.createElement("div");
+        errorMessage.className = "error";
+        errorMessage.textContent =
+          result.error || "An error occurred. Please try again.";
+        form.insertBefore(errorMessage, form.firstChild);
+
+        // Scroll to top of modal to show message
+        const dialogContent = document.querySelector(
+          "#recipe-modal .snippets-modal__content"
+        );
+        if (dialogContent) {
+          dialogContent.scrollTop = 0;
+        }
+      }
+    } catch (error) {
+      console.error("Error submitting form:", error);
+
+      // Show error message
+      const existingError = form.querySelector(".error");
+      if (existingError) existingError.remove();
+
+      const errorMessage = document.createElement("div");
+      errorMessage.className = "error";
+      errorMessage.textContent = "An error occurred. Please try again.";
+      form.insertBefore(errorMessage, form.firstChild);
+    } finally {
+      // Restore submit button
+      submitButton.disabled = false;
+      submitButton.textContent = originalButtonText;
+    }
+  });
+}
+
+async function showRecipeDetail(recipeId, recipeSlug) {
   const modalInner = document.getElementById("modal-inner");
 
   // Show loading state
-  modalInner.innerHTML =
-    '<div style="text-align: center; padding: 40px;">Loading...</div>';
+  // modalInner.innerHTML =
+  //   '<div style="text-align: center; padding: 40px;">Loading...</div>';
 
   try {
     // Fetch rendered Twig template
@@ -174,6 +324,10 @@ async function showRecipeDetail(recipeId) {
     // Update modal state
     currentModalState.view = "detail";
     currentModalState.currentRecipeId = recipeId;
+    currentModalState.currentRecipeSlug = recipeSlug;
+
+    // Update URL for recipe detail using slug
+    updateURLForRecipeDetail(recipeSlug);
   } catch (error) {
     console.error("Error loading recipe detail:", error);
     modalInner.innerHTML = "<p>Error loading recipe. Please try again.</p>";
@@ -183,5 +337,212 @@ async function showRecipeDetail(recipeId) {
 function backToList() {
   if (currentModalState && currentModalState.config) {
     displayRecipeList(currentModalState.config);
+    // Update URL back to list view
+    updateURLForModal(currentModalState.config);
+  }
+}
+
+// Show recipe detail by slug (for URL restoration)
+async function showRecipeDetailBySlug(recipeSlug) {
+  const modalInner = document.getElementById("modal-inner");
+
+  // Show loading state
+  // modalInner.innerHTML =
+  //   '<div style="text-align: center; padding: 40px;">Loading...</div>';
+
+  try {
+    // Fetch rendered Twig template using slug
+    const params = {
+      view: "detail",
+      recipeSlug: recipeSlug,
+    };
+
+    // Only include listTitle if there's a config context
+    if (currentModalState.config && currentModalState.config.listTitle) {
+      params.listTitle = currentModalState.config.listTitle;
+    }
+
+    const html = await fetchModalContent(params);
+
+    modalInner.innerHTML = html;
+
+    // Scroll to top of modal
+    const dialogContent = document.querySelector(
+      "#recipe-modal .dialog-content"
+    );
+    if (dialogContent) {
+      dialogContent.scrollTop = 0;
+    }
+
+    // Update modal state
+    currentModalState.view = "detail";
+    currentModalState.currentRecipeSlug = recipeSlug;
+  } catch (error) {
+    console.error("Error loading recipe detail:", error);
+    modalInner.innerHTML = "<p>Error loading recipe. Please try again.</p>";
+  }
+}
+
+// Open modal with category filter
+async function openCategoryModal(categorySlug) {
+  // Generate title from category slug (capitalize first letter)
+  const title =
+    categorySlug.charAt(0).toUpperCase() + categorySlug.slice(1) + " Recipes";
+
+  const config = {
+    type: "list",
+    view: categorySlug, // Pass slug directly - server handles mapping
+    listTitle: title,
+  };
+
+  // Check if modal is already open
+  const dialog = getModalDialog();
+  if (dialog && dialog.shown) {
+    // Modal is already open, just update the content
+    currentModalState = {
+      config: config,
+      view: "list",
+    };
+    await displayRecipeList(config);
+    // Update URL for category filter
+    updateURLForModal(config);
+  } else {
+    // Modal is closed, open it
+    openModal(config);
+  }
+}
+
+// URL management functions
+function resetURL() {
+  // Reset to base URL without query parameters
+  window.history.pushState({}, "", window.location.pathname);
+}
+
+function updateURLForModal(config) {
+  const params = new URLSearchParams();
+
+  if (config.type === "list") {
+    params.set("cravings", config.view);
+  } else if (config.type === "form") {
+    params.set("cravings", "submit");
+  }
+
+  const newURL = `${window.location.pathname}?${params.toString()}`;
+  window.history.pushState(
+    { modalConfig: config, modalView: "list" },
+    "",
+    newURL
+  );
+}
+
+function updateURLForRecipeDetail(recipeSlug) {
+  const params = new URLSearchParams(window.location.search);
+  params.set("recipe", recipeSlug);
+
+  const newURL = `${window.location.pathname}?${params.toString()}`;
+  window.history.pushState(
+    {
+      modalConfig: currentModalState.config,
+      modalView: "detail",
+      recipeSlug: recipeSlug,
+    },
+    "",
+    newURL
+  );
+}
+
+async function restoreModalFromState(state) {
+  if (state.modalView === "detail" && state.recipeSlug) {
+    // Restore recipe detail view
+    currentModalState = {
+      config: state.modalConfig,
+      view: "detail",
+      currentRecipeSlug: state.recipeSlug,
+    };
+
+    const dialog = getModalDialog();
+    if (!dialog.shown) {
+      await displayRecipeList(state.modalConfig);
+      dialog.show();
+    }
+    // Note: We need to fetch recipe by slug, ajax-modal.twig will handle this
+    await showRecipeDetailBySlug(state.recipeSlug);
+  } else if (state.modalConfig) {
+    // Restore list or form view
+    await openModal(state.modalConfig);
+  }
+}
+
+async function restoreModalFromURL() {
+  const params = new URLSearchParams(window.location.search);
+  const cravings = params.get("cravings");
+  const recipeSlug = params.get("recipe");
+
+  if (!cravings && !recipeSlug) return;
+
+  // If only recipe slug is provided (no cravings context)
+  if (recipeSlug && !cravings) {
+    currentModalState = {
+      config: null, // No back button context
+      view: "detail",
+      currentRecipeSlug: recipeSlug,
+    };
+
+    const dialog = getModalDialog();
+    await showRecipeDetailBySlug(recipeSlug);
+    dialog.show();
+    return;
+  }
+
+  // Build config based on URL parameters
+  let config;
+
+  if (cravings === "submit") {
+    config = {
+      type: "form",
+      url: modalConfig.ajaxUrl.replace("/ajax-modal", "/submit"),
+      listTitle: "Submit a Recipe",
+    };
+  } else if (cravings === "all") {
+    config = {
+      type: "list",
+      view: "all",
+      listTitle: "All Recipes",
+    };
+  } else if (cravings === "categories") {
+    config = {
+      type: "list",
+      view: "categories",
+      listTitle: "All Categories",
+    };
+  } else {
+    // Assume it's a category slug
+    config = {
+      type: "list",
+      view: cravings,
+      listTitle:
+        cravings.charAt(0).toUpperCase() + cravings.slice(1) + " Recipes",
+    };
+  }
+
+  // Open the modal
+  currentModalState = {
+    config: config,
+    view: recipeSlug ? "detail" : "list",
+  };
+
+  const dialog = getModalDialog();
+
+  if (config.type === "list") {
+    await displayRecipeList(config);
+  } else if (config.type === "form") {
+    await displayForm(config);
+  }
+
+  dialog.show();
+
+  // If there's a recipe slug, show the detail view
+  if (recipeSlug) {
+    await showRecipeDetailBySlug(recipeSlug);
   }
 }

@@ -6,6 +6,11 @@
     "craftsnippets/modal-component": "^2.0.1",
     "vlucas/phpdotenv": "^5.4.0"
   },
+  "autoload": {
+    "psr-4": {
+      "modules\\": "modules/"
+    }
+  },
   "require-dev": {
     "craftcms/generator": "^2.0.0",
     "yiisoft/yii2-shell": "^2.0.3"
