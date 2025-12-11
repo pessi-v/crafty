@@ -38,15 +38,16 @@
       <div class="form-group">
         <label class="form-label">Categories</label>
         {% set allCategories = craft.categories().group('labels').all() %}
-        <div class="categories-container">
+        <div class="recipe-categories">
           {% for category in allCategories %}
-            <label class="category-checkbox-label">
+            <label class="category-pill-label">
               <input
                 type="checkbox"
                 name="categories[]"
                 value="{{ category.id }}"
+                class="category-pill-input"
               >
-              {{ category.title }}
+              <span class="category-pill-tag">{{ category.title }}</span>
             </label>
           {% endfor %}
         </div>
@@ -81,7 +82,7 @@
         Submit
       </button>
       <p class="form-note">
-        <em>Your recipe will be reviewed before it appears on the site.</em>
+        <em>Your recipe will be reviewed before it appears on the site. The Password is 'changeme'.</em>
       </p>
     </div>
   </form>

@@ -81,6 +81,15 @@
   textarea,
   select {
     font: inherit;
+    cursor: var(--cursor-pointer);
+  }
+
+  input:active,
+  button:active,
+  textarea:active,
+  select:active {
+    font: inherit;
+    cursor: var(--cursor-click);
   }
 
   textarea {
@@ -147,6 +156,10 @@
   cursor: var(--cursor-pointer);
 }
 
+#animation-container canvas.clicking {
+  cursor: var(--cursor-click);
+}
+
 /* Component styles from styles.css */
 .topics {
   display: flex;
@@ -184,7 +197,7 @@
 .snippets-modal__window {
   background: #f5f5f0 !important;
   border: 2px solid #000;
-  border-radius: 8px !important;
+  border-radius: 20px !important;
   max-height: 80vh !important;
   min-height: 80vh !important;
   width: 35vw !important;
@@ -311,11 +324,48 @@
   gap: 1rem;
 }
 
-.category-checkbox-label {
-  display: flex;
-  align-items: center;
-  gap: 0.3rem;
+/* Toggleable category pill styles */
+.category-pill-label {
+  display: inline-block;
+  cursor: var(--cursor-pointer);
+}
+
+.category-pill-label:active {
+  cursor: var(--cursor-click);
+}
+
+.category-pill-input {
+  display: none;
+}
+
+.category-pill-tag {
+  display: inline-block;
+  border: 1px solid #a6a6a6;
+  border-radius: 4px;
+  padding-left: 4px;
+  padding-right: 4px;
+  padding-bottom: 1px;
+  font-size: smaller;
   text-transform: capitalize;
+  transition: all 0.2s ease;
+  background-color: transparent;
+}
+
+.category-pill-label:hover .category-pill-tag {
+  background-color: #e0e0e0;
+  border-color: #666;
+  transform: translateY(-1px);
+}
+
+.category-pill-input:checked + .category-pill-tag {
+  background-color: var(--color-highlight);
+  border-color: var(--color-highlight);
+  color: white;
+}
+
+.category-pill-label:hover .category-pill-input:checked + .category-pill-tag {
+  background-color: var(--color-base);
+  border-color: var(--color-base);
 }
 
 .content-blocks-container {

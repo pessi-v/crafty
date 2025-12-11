@@ -391,6 +391,31 @@ export function initAnimation(config) {
     }
   }
 
+  // Mouse down handler for click cursor
+  function onMouseDown(event) {
+    // Ignore if modal is open
+    if (window.isModalOpen && window.isModalOpen()) {
+      return;
+    }
+
+    // Calculate mouse position
+    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+    // Update raycaster
+    raycaster.setFromCamera(mouse, camera);
+    const intersects = raycaster.intersectObjects(getClickableMeshes(), false);
+
+    if (intersects.length > 0) {
+      renderer.domElement.classList.add("clicking");
+    }
+  }
+
+  // Mouse up handler to remove click cursor
+  function onMouseUp(event) {
+    renderer.domElement.classList.remove("clicking");
+  }
+
   // Click handler
   function onClick(event) {
     // Ignore clicks if modal is open
@@ -425,6 +450,8 @@ export function initAnimation(config) {
 
   // Add event listeners
   window.addEventListener("mousemove", onMouseMove, false);
+  window.addEventListener("mousedown", onMouseDown, false);
+  window.addEventListener("mouseup", onMouseUp, false);
   window.addEventListener("click", onClick, false);
 
   // Handle window resize
