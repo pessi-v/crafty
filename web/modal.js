@@ -10,6 +10,33 @@ export function initModal(config) {
   console.log("modal initiation");
   modalConfig = config;
 
+  // Handle browser back/forward buttons
+  window.addEventListener("popstate", function (e) {
+    if (e.state && e.state.modalConfig) {
+      // Restore modal from history state
+      restoreModalFromState(e.state);
+    } else {
+      // No modal state, close modal if open
+      const dialog = getModalDialog();
+      if (dialog && dialog.shown) {
+        dialog.hide();
+      }
+    }
+  });
+
+  // Check URL on page load to restore modal state
+  restoreModalFromURL();
+
+  // Listen for modal close events to reset URL
+  const modalElement = document.getElementById("recipe-modal");
+  if (modalElement) {
+    // Use the plugin's built-in hide event
+    modalElement.addEventListener("hide", function (event) {
+      console.log("Modal hide event triggered, resetting URL");
+      resetURL();
+    });
+  }
+
   // Event delegation for dynamically loaded content
   document
     .getElementById("modal-inner")
@@ -109,6 +136,9 @@ async function openModal(config) {
     config: config,
     view: "list",
   };
+
+  // Update URL with modal state
+  updateURLForModal(config);
 
   // Display recipe list or form
   if (config.type === "list") {
@@ -294,6 +324,9 @@ async function showRecipeDetail(recipeId) {
     // Update modal state
     currentModalState.view = "detail";
     currentModalState.currentRecipeId = recipeId;
+
+    // Update URL for recipe detail
+    updateURLForRecipeDetail(recipeId);
   } catch (error) {
     console.error("Error loading recipe detail:", error);
     modalInner.innerHTML = "<p>Error loading recipe. Please try again.</p>";
@@ -303,6 +336,8 @@ async function showRecipeDetail(recipeId) {
 function backToList() {
   if (currentModalState && currentModalState.config) {
     displayRecipeList(currentModalState.config);
+    // Update URL back to list view
+    updateURLForModal(currentModalState.config);
   }
 }
 
@@ -329,8 +364,129 @@ async function openCategoryModal(categorySlug) {
       view: "list",
     };
     await displayRecipeList(config);
+    // Update URL for category filter
+    updateURLForModal(config);
   } else {
     // Modal is closed, open it
     openModal(config);
+  }
+}
+
+// URL management functions
+function resetURL() {
+  // Reset to base URL without query parameters
+  window.history.pushState({}, "", window.location.pathname);
+}
+
+function updateURLForModal(config) {
+  const params = new URLSearchParams();
+
+  if (config.type === "list") {
+    params.set("cravings", config.view);
+  } else if (config.type === "form") {
+    params.set("cravings", "submit");
+  }
+
+  const newURL = `${window.location.pathname}?${params.toString()}`;
+  window.history.pushState(
+    { modalConfig: config, modalView: "list" },
+    "",
+    newURL
+  );
+}
+
+function updateURLForRecipeDetail(recipeId) {
+  const params = new URLSearchParams(window.location.search);
+  params.set("recipe", recipeId);
+
+  const newURL = `${window.location.pathname}?${params.toString()}`;
+  window.history.pushState(
+    {
+      modalConfig: currentModalState.config,
+      modalView: "detail",
+      recipeId: recipeId,
+    },
+    "",
+    newURL
+  );
+}
+
+async function restoreModalFromState(state) {
+  if (state.modalView === "detail" && state.recipeId) {
+    // Restore recipe detail view
+    currentModalState = {
+      config: state.modalConfig,
+      view: "detail",
+      currentRecipeId: state.recipeId,
+    };
+
+    const dialog = getModalDialog();
+    if (!dialog.shown) {
+      await displayRecipeList(state.modalConfig);
+      dialog.show();
+    }
+    await showRecipeDetail(state.recipeId);
+  } else if (state.modalConfig) {
+    // Restore list or form view
+    await openModal(state.modalConfig);
+  }
+}
+
+async function restoreModalFromURL() {
+  const params = new URLSearchParams(window.location.search);
+  const cravings = params.get("cravings");
+  const recipeId = params.get("recipe");
+
+  if (!cravings) return;
+
+  // Build config based on URL parameters
+  let config;
+
+  if (cravings === "submit") {
+    config = {
+      type: "form",
+      url: modalConfig.ajaxUrl.replace("/ajax-modal", "/submit"),
+      listTitle: "Submit a Recipe",
+    };
+  } else if (cravings === "all") {
+    config = {
+      type: "list",
+      view: "all",
+      listTitle: "All Recipes",
+    };
+  } else if (cravings === "categories") {
+    config = {
+      type: "list",
+      view: "categories",
+      listTitle: "All Categories",
+    };
+  } else {
+    // Assume it's a category slug
+    config = {
+      type: "list",
+      view: cravings,
+      listTitle: cravings.charAt(0).toUpperCase() + cravings.slice(1) + " Recipes",
+    };
+  }
+
+  // Open the modal
+  currentModalState = {
+    config: config,
+    view: recipeId ? "detail" : "list",
+  };
+
+  const dialog = getModalDialog();
+
+  if (config.type === "list") {
+    await displayRecipeList(config);
+  } else if (config.type === "form") {
+    await displayForm(config);
+  }
+
+  dialog.show();
+
+  // If there's a recipe ID, show the detail view
+  if (recipeId) {
+    await showRecipeDetail(recipeId);
   }
 }
