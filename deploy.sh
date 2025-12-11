@@ -106,31 +106,10 @@ docker compose up -d
 info "Installing Composer dependencies (production mode)..."
 docker compose exec -T --user www-data php composer install --no-dev --optimize-autoloader --no-interaction || echo "WARNING: Composer install had non-zero exit"
 
-info "DEBUG: About to check Node.js..."
-echo "DEBUG: Still running after composer install"
-
-info "Checking Node.js installation..."
-which node || echo "ERROR: Node.js not found!"
-node --version || echo "ERROR: Cannot run node"
-which npm || echo "ERROR: npm not found!"
-npm --version || echo "ERROR: Cannot run npm"
-
-info "Creating web/static/dist directory..."
+info "Building frontend assets..."
 mkdir -p web/static/dist
-
-info "Installing npm dependencies and building assets on host..."
-npm install || echo "WARNING: npm install failed"
-npm run build || echo "ERROR: npm run build failed"
-
-info "Verifying build artifacts exist..."
-if [ ! -f "web/static/dist/manifest.json" ]; then
-    echo "ERROR: Build failed - manifest.json not found!"
-    ls -la web/static/ || echo "web/static/ does not exist"
-    exit 1
-fi
-
-info "Build successful! Generated files:"
-ls -lh web/static/dist/
+npm install --no-audit --no-fund || echo "WARNING: npm install had issues"
+npm run build || { echo "ERROR: npm build failed!"; exit 1; }
 
 info "Setting permissions on built assets..."
 chown -R www-data:www-data web/static
