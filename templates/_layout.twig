@@ -14,9 +14,7 @@
 			}
 		</script>
 
-		<link rel="stylesheet" href="/styles.css?v={{ '/styles.css'|hash }}">
-		<link rel="stylesheet" href="/animation.css?v={{ '/animation.css'|hash }}">
-		<link rel="stylesheet" href="/modal.css?v={{ '/modal.css'|hash }}">
+		{{ craft.vite.script("src/js/main.js", false) }}
 
 		<!--Attribution for 3D objects:
 		Pepper Grinder by MilkAndBanana (https://poly.pizza/m/5YSOGQw7jt)

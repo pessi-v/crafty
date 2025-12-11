@@ -1,4 +1,4 @@
-dateModified: 1765460574
+dateModified: 1765468617
 email:
   fromEmail: pessimo@posteo.net
   fromName: crafty
@@ -34,6 +34,10 @@ meta:
     fabf8d91-b566-4bc7-901d-9813a689ac30: Labels # Labels
 plugins:
   modal-component:
+    edition: standard
+    enabled: true
+    schemaVersion: 1.0.0
+  vite:
     edition: standard
     enabled: true
     schemaVersion: 1.0.0

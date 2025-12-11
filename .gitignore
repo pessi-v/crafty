@@ -26,3 +26,11 @@ backup-*
 
 DEPLOYMENT.md
 .carbonara
+
+# Node modules
+node_modules/
+package-lock.json
+
+# Vite build output
+/web/static/dist/
+.vite/

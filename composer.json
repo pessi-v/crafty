@@ -4,6 +4,7 @@
   "require": {
     "craftcms/cms": "^5.0.0",
     "craftsnippets/modal-component": "^2.0.1",
+    "nystudio107/craft-vite": "^5.0.1",
     "vlucas/phpdotenv": "^5.4.0"
   },
   "autoload": {

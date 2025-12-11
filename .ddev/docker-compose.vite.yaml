@@ -1,0 +1,7 @@
+version: '3.6'
+services:
+  web:
+    expose:
+      - 3000
+    environment:
+      - DDEV_HOSTNAME=${DDEV_HOSTNAME}
