@@ -16,4 +16,5 @@
 
 #animation-container canvas.pointer {
   cursor: pointer;
+  /* cursor: var(--cursor-pointer); */
 }

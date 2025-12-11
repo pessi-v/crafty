@@ -11,7 +11,7 @@
           {% if recipe.recipeCategories|length %}
             <div class="recipe-categories">
               {% for category in recipe.recipeCategories.all() %}
-                <div class="recipe-category-tag">{{ category.title }}</div>
+                <div class="recipe-category-tag clickable" data-category-slug="{{ category.slug }}">{{ category.title }}</div>
               {% endfor %}
             </div>
           {% endif %}

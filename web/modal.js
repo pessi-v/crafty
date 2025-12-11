@@ -14,6 +14,17 @@ export function initModal(config) {
   document
     .getElementById("modal-inner")
     .addEventListener("click", function (e) {
+      // Handle category tag clicks
+      const categoryTag = e.target.closest(".recipe-category-tag");
+      if (categoryTag) {
+        e.stopPropagation(); // Prevent triggering recipe item click
+        const categorySlug = categoryTag.getAttribute("data-category-slug");
+        if (categorySlug) {
+          openCategoryModal(categorySlug);
+        }
+        return;
+      }
+
       // Handle recipe list item clicks
       const recipeItem = e.target.closest(".recipe-list-item");
       if (recipeItem) {
@@ -290,5 +301,34 @@ async function showRecipeDetail(recipeId) {
 function backToList() {
   if (currentModalState && currentModalState.config) {
     displayRecipeList(currentModalState.config);
+  }
+}
+
+// Open modal with category filter
+async function openCategoryModal(categorySlug) {
+  // Generate title from category slug (capitalize first letter)
+  const title =
+    categorySlug.charAt(0).toUpperCase() +
+    categorySlug.slice(1) +
+    " Recipes";
+
+  const config = {
+    type: "list",
+    view: categorySlug, // Pass slug directly - server handles mapping
+    listTitle: title,
+  };
+
+  // Check if modal is already open
+  const dialog = getModalDialog();
+  if (dialog && dialog.shown) {
+    // Modal is already open, just update the content
+    currentModalState = {
+      config: config,
+      view: "list",
+    };
+    await displayRecipeList(config);
+  } else {
+    // Modal is closed, open it
+    openModal(config);
   }
 }

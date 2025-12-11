@@ -9,7 +9,7 @@
 {% if categories|length %}
   <div class="recipe-categories">
     {% for category in categories %}
-      <div class="recipe-category-tag">
+      <div class="recipe-category-tag clickable" data-category-slug="{{ category.slug }}">
         {{ category.title }}
       </div>
     {% endfor %}

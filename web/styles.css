@@ -11,6 +11,10 @@
     system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif,
     "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
   --type-technical: monospace;
+  --cursor-default: url("cursor_empty.png"), auto;
+  --cursor-pointer: url("cursor_blue.png"), auto;
+  /* --cursor-pointer: url("cursor_black.png"), auto; */
+  --cursor-click: url("cursor_blue.png"), auto;
 }
 
 /* CSS Reset */
@@ -24,7 +28,9 @@
 
 /* 2. Remove default margin */
 * {
+  padding: 0;
   margin: 0;
+  cursor: var(--cursor-default);
 }
 
 /* 3. Enable keyword animations */
@@ -39,6 +45,13 @@ body {
   line-height: 1.4;
   /* 5. Improve text rendering */
   -webkit-font-smoothing: antialiased;
+  cursor: var(--cursor-default);
+  color: var(--color-base);
+  font-family: var(--type-system-ui);
+  margin: 0;
+  overflow: hidden;
+  padding: var(--layout-site-gutter)
+    max(var(--layout-site-gutter), calc((100vw - var(--layout-site-width)) / 2));
 }
 
 /* 6. Improve media defaults */
@@ -95,36 +108,12 @@ h6 {
   isolation: isolate;
 }
 
-/* Containers */
-
-* {
-  padding: 0;
-  margin: 0;
-}
-
-body {
-  color: var(--color-base);
-  font-family: var(--type-system-ui);
-  margin: 0;
-  overflow: hidden;
-  padding: var(--layout-site-gutter)
-    max(var(--layout-site-gutter), calc((100vw - var(--layout-site-width)) / 2));
-}
-
-header {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: var(--layout-site-section-spacer);
-}
-
-footer {
-}
-
 /* Elements */
 
 a {
   color: inherit;
   text-decoration: none;
+  cursor: var(--cursor-pointer);
 }
 
 /* Posts */
