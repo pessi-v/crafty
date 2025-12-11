@@ -154,7 +154,7 @@ export function initAnimation(config) {
       rotationZ: 0.005,
       model: null,
     },
-    pepper_grinder: {
+    hamburger: {
       radius: 5.0,
       speed: 0.2,
       tilt: 0.18,
@@ -251,7 +251,7 @@ export function initAnimation(config) {
   loadSatellite("pig", 0.005);
   loadSatellite("eggplant", 0.45);
   loadSatellite("peapod", 0.08);
-  loadSatellite("pepper_grinder", 0.25);
+  loadSatellite("hamburger", 0.1);
 
   // Animation variables
   let time = 0;

@@ -14,11 +14,11 @@ export function initModal(config) {
   document
     .getElementById("modal-inner")
     .addEventListener("click", function (e) {
-      // Handle category tag clicks
-      const categoryTag = e.target.closest(".recipe-category-tag");
-      if (categoryTag) {
+      // Handle category tag and category card clicks
+      const categoryElement = e.target.closest(".recipe-category-tag, .category-card");
+      if (categoryElement) {
         e.stopPropagation(); // Prevent triggering recipe item click
-        const categorySlug = categoryTag.getAttribute("data-category-slug");
+        const categorySlug = categoryElement.getAttribute("data-category-slug");
         if (categorySlug) {
           openCategoryModal(categorySlug);
         }
@@ -134,12 +134,14 @@ async function displayRecipeList(config) {
       listTitle: config.listTitle,
     });
 
+    console.log("Fetched HTML:", html.substring(0, 200)); // Debug: show first 200 chars
     modalInner.innerHTML = html;
 
     // Update modal state
     currentModalState.view = "list";
   } catch (error) {
     console.error("Error loading recipe list:", error);
+    console.error("Config was:", config);
     modalInner.innerHTML = "<p>Error loading recipes. Please try again.</p>";
   }
 }

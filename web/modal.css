@@ -172,3 +172,38 @@
   color: #666;
   font-size: 0.9rem;
 }
+
+/* Categories grid */
+.categories-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.category-card {
+  border: 2px solid #a6a6a6;
+  border-radius: 8px;
+  padding: 1rem;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+
+.category-card.clickable {
+  cursor: url("cursor_blue.png"), pointer;
+}
+
+.category-card.clickable:hover {
+  background-color: #e0e0e0;
+  border-color: #666;
+  transform: translateY(-2px);
+}
+
+.category-card h3 {
+  margin: 0 0 0.5rem 0;
+  text-transform: capitalize;
+}
+
+.category-card .recipe-count {
+  color: #666;
+  font-size: 0.9rem;
+}

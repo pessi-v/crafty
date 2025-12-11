@@ -14,7 +14,13 @@
   'garlic': 'garlicky'
 } %}
 
-{% if view == 'all' %}
+{% if view == 'categories' %}
+  {# Query all categories #}
+  {% set categories = craft.categories()
+    .group('labels')
+    .all() %}
+
+{% elseif view == 'all' %}
   {# Query all recipes #}
   {% set recipes = craft.entries()
     .section('recipes')
@@ -55,8 +61,13 @@
 
 {% endif %}
 
-{# Render modal list for all non-detail views #}
-{% if view != 'detail' and recipes is defined %}
+{# Render modal content based on view type #}
+{% if view == 'categories' and categories is defined %}
+  {% include 'recipes/_modal-categories' with {
+    categories: categories,
+    listTitle: listTitle
+  } %}
+{% elseif view != 'detail' and recipes is defined %}
   {% include 'recipes/_modal-list' with {
     recipes: recipes,
     listTitle: listTitle

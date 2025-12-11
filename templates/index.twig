@@ -30,9 +30,9 @@
     clickableObjects: {
       turnip: {
         name: "Turnip Planet",
-        type: "list",
-        view: "all",
-        listTitle: "All Recipes"
+        type: "form",
+        url: "{{ siteUrl('recipes/submit') }}",
+        listTitle: "Submit a Recipe"
       },
       chili: {
         name: "Chili Satellite",
@@ -70,16 +70,25 @@
         view: "pig",
         listTitle: "Meat Recipes"
       },
-      pepper_grinder: {
-        name: "Pepper Grinder Satellite",
-        type: "form",
-        url: "{{ siteUrl('recipes/submit') }}",
-        listTitle: "Submit a Recipe"
+      hamburger: {
+        name: "Hamburger Satellite",
+        type: "list",
+        view: "categories",
+        listTitle: "All Categories"
       },
     },
   };
 
   // Initialize the animation
   initAnimation(animationConfig);
+
+  // Add click handler for hamburger menu icon
+  document.getElementById('hamburger-menu-icon').addEventListener('click', function() {
+    window.openModal({
+      type: "list",
+      view: "all",
+      listTitle: "All Recipes"
+    });
+  });
 </script>
 {% endblock %}
