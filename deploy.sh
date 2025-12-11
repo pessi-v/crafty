@@ -110,8 +110,18 @@ info "Creating web/static/dist directory..."
 mkdir -p web/static/dist
 
 info "Installing npm dependencies and building assets on host..."
-npm install
-npm run build
+npm install || echo "WARNING: npm install failed"
+npm run build || echo "ERROR: npm run build failed"
+
+info "Verifying build artifacts exist..."
+if [ ! -f "web/static/dist/manifest.json" ]; then
+    echo "ERROR: Build failed - manifest.json not found!"
+    ls -la web/static/ || echo "web/static/ does not exist"
+    exit 1
+fi
+
+info "Build successful! Generated files:"
+ls -lh web/static/dist/
 
 info "Setting permissions on built assets..."
 chown -R www-data:www-data web/static
