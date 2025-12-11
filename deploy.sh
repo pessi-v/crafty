@@ -106,6 +106,12 @@ docker compose up -d
 info "Installing Composer dependencies (production mode)..."
 docker compose exec -T --user www-data php composer install --no-dev --optimize-autoloader --no-interaction
 
+info "Installing npm dependencies..."
+docker compose exec -T --user www-data php npm install
+
+info "Building front-end assets..."
+docker compose exec -T --user www-data php npm run build
+
 info "Running Craft migrations..."
 docker compose exec -T --user www-data php ./craft migrate/all --interactive=0 || echo "No migrations to run"
 
