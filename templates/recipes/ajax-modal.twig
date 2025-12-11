@@ -75,10 +75,20 @@
 {% elseif view == 'detail' %}
   {# Render single recipe detail #}
   {% set recipeId = craft.app.request.getParam('recipeId') %}
-  {% set recipe = craft.entries()
-    .section('recipes')
-    .id(recipeId)
-    .one() %}
+  {% set recipeSlug = craft.app.request.getParam('recipeSlug') %}
+
+  {# Query by slug first (for URLs), fallback to ID (for internal clicks) #}
+  {% if recipeSlug %}
+    {% set recipe = craft.entries()
+      .section('recipes')
+      .slug(recipeSlug)
+      .one() %}
+  {% elseif recipeId %}
+    {% set recipe = craft.entries()
+      .section('recipes')
+      .id(recipeId)
+      .one() %}
+  {% endif %}
 
   {% if recipe %}
     {% include 'recipes/_modal-detail' with {

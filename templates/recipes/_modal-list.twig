@@ -6,7 +6,7 @@
   {% if recipes|length %}
     <ul>
       {% for recipe in recipes %}
-        <li class="recipe-list-item" data-recipe-id="{{ recipe.id }}">
+        <li class="recipe-list-item" data-recipe-id="{{ recipe.id }}" data-recipe-slug="{{ recipe.slug }}">
           <h3>{{ recipe.title }}</h3>
           {% if recipe.recipeCategories|length %}
             <div class="recipe-categories">

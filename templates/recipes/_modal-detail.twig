@@ -1,7 +1,9 @@
 {# Recipe detail view for modal #}
-{# Expected variables: recipe, listTitle #}
+{# Expected variables: recipe, listTitle (optional) #}
 
-<button class="modal-back-button" data-action="back">Back to {{ listTitle }}</button>
+{% if listTitle %}
+  <button class="modal-back-button" data-action="back">Back to {{ listTitle }}</button>
+{% endif %}
 
 <h1 class="modal-title">{{ recipe.title }}</h1>
 

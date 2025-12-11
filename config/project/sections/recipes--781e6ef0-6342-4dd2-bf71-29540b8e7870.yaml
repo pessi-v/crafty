@@ -17,5 +17,5 @@ siteSettings:
     enabledByDefault: true
     hasUrls: true
     template: recipes/_entry.twig
-    uriFormat: 'recipes/{slug}'
+    uriFormat: '?cravings=all&recipe={slug}'
 type: channel
