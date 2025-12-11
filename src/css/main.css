@@ -20,11 +20,11 @@
 
   /* Cursor */
   /* cursor: url(<file>) left-offset top-offset, fallback cursor; */
-  --cursor-default: url("cursor_empty.png") 20 10, auto;
-  /* --cursor-pointer: url("cursor_blue.png"), auto; */
-  --cursor-pointer: url("cursor_black.png") 23 10, auto;
-  --cursor-click: url("cursor_blue.png"), auto;
-  --cursor-click: url("cursor_black_click.png") 35 30, auto;
+  --cursor-default: url("/cursor_empty.png") 20 10, auto;
+  /* --cursor-pointer: url("/cursor_blue.png"), auto; */
+  --cursor-pointer: url("/cursor_black.png") 23 10, auto;
+  --cursor-click: url("/cursor_blue.png"), auto;
+  --cursor-click: url("/cursor_black_click.png") 35 30, auto;
 }
 
 @layer base {
