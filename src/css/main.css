@@ -334,6 +334,14 @@
   cursor: var(--cursor-click);
 }
 
+.category-pill-tag {
+  cursor: var(--cursor-pointer);
+}
+
+.category-pill-tag:active {
+  cursor: var(--cursor-click);
+}
+
 .category-pill-input {
   display: none;
 }

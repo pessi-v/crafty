@@ -20,6 +20,12 @@ web_extra_exposed_ports:
     container_port: 3000
     http_port: 3000
     https_port: 3001
+
+# Auto-start Vite dev server
+web_extra_daemons:
+  - name: "vite"
+    command: "npm run dev"
+    directory: /var/www/html
 # Key features of DDEV's config.yaml:
 
 # name: <projectname> # Name of the project, automatically provides
