@@ -114,6 +114,21 @@ mkdir -p web/static/dist
 npm install --no-audit --no-fund || echo "WARNING: npm install had issues"
 npm run build || { echo "ERROR: npm build failed!"; exit 1; }
 
+info "Verifying build artifacts..."
+MANIFEST_FILE="web/static/dist/manifest.json"
+if [ ! -f "$MANIFEST_FILE" ]; then
+    echo "ERROR: manifest.json not found at $MANIFEST_FILE"
+    exit 1
+fi
+
+# Check if manifest was modified in the last 60 seconds
+if [ $(find "$MANIFEST_FILE" -mmin -1 2>/dev/null | wc -l) -eq 0 ]; then
+    echo "ERROR: manifest.json was not updated by the build!"
+    echo "Last modified: $(stat -c '%y' "$MANIFEST_FILE" 2>/dev/null || stat -f '%Sm' "$MANIFEST_FILE")"
+    exit 1
+fi
+info "Build verified - manifest.json updated successfully"
+
 info "Setting permissions on built assets..."
 chown -R www-data:www-data web/static
 
