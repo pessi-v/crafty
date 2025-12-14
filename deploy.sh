@@ -100,7 +100,10 @@ git pull origin "${BRANCH}"
 info "rebuilding Dockerimage"
 docker compose build php
 
-info "restarting with new Dockerimage"
+info "stopping containers to clear OPcache"
+docker compose down
+
+info "starting containers with new Dockerimage"
 docker compose up -d
 
 info "Installing Composer dependencies (production mode)..."
@@ -122,12 +125,6 @@ docker compose exec -T --user www-data php ./craft project-config/apply --force 
 
 info "Clearing Craft caches..."
 docker compose exec -T --user www-data php ./craft clear-caches/all
-
-info "Restarting PHP-FPM..."
-docker compose restart php
-
-info "Restarting Nginx..."
-docker compose restart nginx
 
 info "Deployment complete!"
 ENDSSH

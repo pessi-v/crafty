@@ -25,6 +25,7 @@ services:
       # Bind mount writable directories only
       - ./storage:/var/www/html/storage
       - ./web/cpresources:/var/www/html/web/cpresources
+      - ./web/static/dist:/var/www/html/web/static/dist
       - ./.env:/var/www/html/.env
     environment:
       # Craft will read from .env file
