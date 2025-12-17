@@ -1,13 +1,14 @@
 {# Recipe list view for modal #}
 {# Expected variables: recipes, listTitle #}
 
-<h2 class="capitalize text-4xl">{{ listTitle }}</h2>
-{# <div class="recipe-list"> #}
+<div class="flex flex-col gap-4">
+  <h2 class="capitalize text-4xl">{{ listTitle }}</h2>
+  
   {% if recipes|length %}
-    <ul>
+    <ul class="grid gap-3">
       {% for recipe in recipes %}
         <li class="recipe-list-item" data-recipe-id="{{ recipe.id }}" data-recipe-slug="{{ recipe.slug }}">
-          <h3 class="clickable inline-block">{{ recipe.title }}</h3>
+          <h3 class="clickable inline-block capitalize text-lg font-semibold">{{ recipe.title }}</h3>
           {% if recipe.recipeCategories|length %}
             <div class="recipe-categories">
               {% for category in recipe.recipeCategories.all() %}
@@ -21,4 +22,5 @@
   {% else %}
     <p>No recipes found</p>
   {% endif %}
-{# </div> #}
+  
+</div>

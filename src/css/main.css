@@ -194,9 +194,10 @@
 .snippets-modal__container ul,
 .snippets-modal__container ol {
   padding-left: 1rem !important;
-  text-transform: capitalize;
+  /* text-transform: capitalize;
   display: grid;
   gap: 1rem;
+  */
   list-style-type: disc;
 }
 
