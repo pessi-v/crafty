@@ -2,11 +2,6 @@
 
 /* Tailwind v4 Theme Configuration */
 @theme {
-  /* Colors from styles.css */
-  --color-base: #222;
-  --color-highlight: #e5422b;
-  --color-muted: #aaa;
-
   /* Typography */
   --font-system-ui: system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   --font-technical: monospace;
@@ -136,6 +131,12 @@
   }
 }
 
+:root {
+  --color-base: #222;
+  --color-highlight: #405ab0ff;
+  --color-muted: #aaa;
+}
+
 /* Animation container styles from animation.css */
 #animation-container {
   position: fixed;
@@ -158,39 +159,6 @@
 
 #animation-container canvas.clicking {
   cursor: var(--cursor-click);
-}
-
-/* Component styles from styles.css */
-.topics {
-  display: flex;
-  list-style: none;
-  margin: var(--spacing-site-gutter) 0;
-  padding: 0;
-}
-
-.topics li {
-  margin-right: 4px;
-}
-
-.topics a {
-  background-color: var(--color-highlight);
-  border-radius: 2px;
-  color: white;
-  font-family: var(--font-technical);
-  padding: 2px 8px;
-  text-transform: uppercase;
-}
-
-.topics a:hover {
-  background-color: var(--color-base);
-}
-
-.content-block {
-  margin-bottom: var(--spacing-site-gutter);
-}
-
-.content-block:last-child {
-  margin-bottom: 0;
 }
 
 /* Modal styles from modal.css */
@@ -241,10 +209,6 @@
   gap: 8px;
 }
 
-.recipe-category-tag:active {
-  cursor: var(--cursor-click);
-}
-
 .recipe-category-tag {
   border: 1px solid #a6a6a6;
   border-radius: 4px;
@@ -257,11 +221,11 @@
   cursor: var(--cursor-pointer);
 }
 
-.recipe-category-tag.clickable {
+.clickable {
   cursor: var(--cursor-pointer);
 }
 
-.recipe-category-tag.clickable:hover:active {
+.clickable:active {
   cursor: var(--cursor-click);
 }
 
@@ -274,12 +238,6 @@
 .modal-back-button::before {
   content: "←";
   font-size: 1.2em;
-}
-
-.flex-column {
-  display: flex;
-  flex-direction: column;
-  gap: 1.2rem;
 }
 
 .notice {
@@ -325,22 +283,6 @@
 }
 
 /* Toggleable category pill styles */
-.category-pill-label {
-  display: inline-block;
-  cursor: var(--cursor-pointer);
-}
-
-.category-pill-label:active {
-  cursor: var(--cursor-click);
-}
-
-.category-pill-tag {
-  cursor: var(--cursor-pointer);
-}
-
-.category-pill-tag:active {
-  cursor: var(--cursor-click);
-}
 
 .category-pill-input {
   display: none;
@@ -355,14 +297,14 @@
   padding-bottom: 1px;
   font-size: smaller;
   text-transform: capitalize;
-  transition: all 0.2s ease;
+  /* transition: all 0.2s ease; */
   background-color: transparent;
 }
 
 .category-pill-label:hover .category-pill-tag {
   background-color: #e0e0e0;
   border-color: #666;
-  transform: translateY(-1px);
+  /* transform: translateY(-1px); */
 }
 
 .category-pill-input:checked + .category-pill-tag {
@@ -376,23 +318,6 @@
   border-color: var(--color-base);
 }
 
-.content-blocks-container {
-  display: flex;
-  gap: 1rem;
-  margin-top: 1rem;
-}
-
-.content-block-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 0.5rem;
-}
-
-.form-helper-text {
-  color: #666;
-}
-
 .submit-button {
   padding: 0.75rem 2rem;
   background: #b48595;
@@ -404,9 +329,7 @@
 }
 
 .form-note {
-  margin-top: 1rem;
-  color: #666;
-  font-size: 0.9rem;
+  color: var(--color-muted);
 }
 
 .categories-modal__categories {

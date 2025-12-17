@@ -71,8 +71,6 @@ info "Connecting to ${SERVER} and deploying..."
 
 # Use SSH agent forwarding to allow git operations on remote server
 ssh -A "${REMOTE_USER}@${SERVER}" "bash -s" -- "${REMOTE_PATH}" "${BRANCH}" << 'ENDSSH'
-set -e
-
 # Get the remote path and branch from the arguments
 REMOTE_PATH="$1"
 BRANCH="$2"
@@ -107,7 +105,7 @@ info "starting containers with new Dockerimage"
 docker compose up -d
 
 info "Installing Composer dependencies (production mode)..."
-docker compose exec -T --user www-data php composer install --no-dev --optimize-autoloader --no-interaction || echo "WARNING: Composer install had non-zero exit"
+docker compose exec -T --user www-data php composer install --no-dev --optimize-autoloader --no-interaction < /dev/null || echo "WARNING: Composer install had non-zero exit"
 
 info "Building frontend assets..."
 mkdir -p web/static/dist
@@ -133,13 +131,13 @@ info "Setting permissions on built assets..."
 chown -R www-data:www-data web/static
 
 info "Running Craft migrations..."
-docker compose exec -T --user www-data php ./craft migrate/all --interactive=0 || echo "No migrations to run"
+docker compose exec -T --user www-data php ./craft migrate/all --interactive=0 < /dev/null || echo "No migrations to run"
 
 info "Applying project config..."
-docker compose exec -T --user www-data php ./craft project-config/apply --force || echo "No project config changes"
+docker compose exec -T --user www-data php ./craft project-config/apply --force < /dev/null || echo "No project config changes"
 
 info "Clearing Craft caches..."
-docker compose exec -T --user www-data php ./craft clear-caches/all
+docker compose exec -T --user www-data php ./craft clear-caches/all < /dev/null
 
 info "Deployment complete!"
 ENDSSH

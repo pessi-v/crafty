@@ -1,7 +1,7 @@
 {% extends "_layout" %}
 
 {% block content %}
-<div id="recipe-submit-container" class="flex-column">
+<div id="recipe-submit-container" class="flex-col">
   <h class="capitalize text-4xl">Submit a Recipe</h>
 
   {% if craft.app.session.hasFlash('notice') %}
@@ -20,7 +20,7 @@
     {{ csrfInput() }}
     {{ actionInput('recipesmodule/recipes/submit') }}
 
-    <div class="flex-column">
+    <div class="flex-col">
       <div class="form-group">
         <label for="title" class="form-label">
           Title
@@ -40,14 +40,14 @@
         {% set allCategories = craft.categories().group('labels').all() %}
         <div class="recipe-categories">
           {% for category in allCategories %}
-            <label class="category-pill-label">
+            <label class="category-pill-label clickable inline-block">
               <input
                 type="checkbox"
                 name="categories[]"
                 value="{{ category.id }}"
                 class="category-pill-input"
               >
-              <span class="category-pill-tag">{{ category.title }}</span>
+              <span class="category-pill-tag clickable">{{ category.title }}</span>
             </label>
           {% endfor %}
         </div>
@@ -81,7 +81,7 @@
       <button type="submit" class="submit-button">
         Submit
       </button>
-      <p class="form-note">
+      <p class="form-note text-sm">
         <em>Your recipe will be reviewed before it appears on the site. The Password is 'changeme'.</em>
       </p>
     </div>
