@@ -19,6 +19,21 @@ class RecipesController extends Controller
 
     public function actionSubmit(): Response
     {
+        // Add CORS headers
+        $this->response->headers->set('Access-Control-Allow-Origin', '*');
+        $this->response->headers->set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+        $this->response->headers->set('Access-Control-Allow-Headers', 'Content-Type, Accept');
+
+        // Handle OPTIONS preflight request
+        if (Craft::$app->request->isOptions) {
+            return $this->response;
+        }
+
+        // If GET request, render the template
+        if (Craft::$app->request->isGet) {
+            return $this->renderTemplate('recipes/submit');
+        }
+
         $this->requirePostRequest();
 
         // Get the password from environment variable

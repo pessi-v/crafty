@@ -2,7 +2,7 @@
 {# Expected variables: recipe, listTitle (optional) #}
 
 {% if listTitle %}
-  <button class="modal-back-button" data-action="back">Back to {{ listTitle }}</button>
+  <button class="modal__back-button" data-action="back">Back to {{ listTitle }}</button>
 {% endif %}
 
 <h2 class="capitalize text-4xl">{{ recipe.title }}</h2>
@@ -11,7 +11,7 @@
 {% if categories|length %}
   <div class="recipe-categories">
     {% for category in categories %}
-      <div class="recipe-category-tag clickable" data-category-slug="{{ category.slug }}">
+      <div class="recipe-categories__tag clickable" data-category-slug="{{ category.slug }}">
         {{ category.title }}
       </div>
     {% endfor %}

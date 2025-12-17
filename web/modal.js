@@ -42,7 +42,7 @@ export function initModal(config) {
     .addEventListener("click", function (e) {
       // Handle category tag and category card clicks
       const categoryElement = e.target.closest(
-        ".recipe-category-tag, .category-card"
+        ".recipe-categories__tag, .category-card"
       );
       if (categoryElement) {
         e.stopPropagation(); // Prevent triggering recipe item click
@@ -299,10 +299,6 @@ function attachFormSubmissionHandler() {
 async function showRecipeDetail(recipeId, recipeSlug) {
   const modalInner = document.getElementById("modal-inner");
 
-  // Show loading state
-  // modalInner.innerHTML =
-  //   '<div style="text-align: center; padding: 40px;">Loading...</div>';
-
   try {
     // Fetch rendered Twig template
     const html = await fetchModalContent({
@@ -312,14 +308,6 @@ async function showRecipeDetail(recipeId, recipeSlug) {
     });
 
     modalInner.innerHTML = html;
-
-    // Scroll to top of modal
-    const dialogContent = document.querySelector(
-      "#recipe-modal .dialog-content"
-    );
-    if (dialogContent) {
-      dialogContent.scrollTop = 0;
-    }
 
     // Update modal state
     currentModalState.view = "detail";
@@ -345,10 +333,6 @@ function backToList() {
 // Show recipe detail by slug (for URL restoration)
 async function showRecipeDetailBySlug(recipeSlug) {
   const modalInner = document.getElementById("modal-inner");
-
-  // Show loading state
-  // modalInner.innerHTML =
-  //   '<div style="text-align: center; padding: 40px;">Loading...</div>';
 
   try {
     // Fetch rendered Twig template using slug

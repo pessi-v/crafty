@@ -6,7 +6,7 @@
 {% if categories|length %}
   <div class="categories-modal__categories w-100">
     {% for category in categories %}
-      <div class="recipe-category-tag clickable" data-category-slug="{{ category.slug }}">
+      <div class="recipe-categories__tag clickable" data-category-slug="{{ category.slug }}">
         {{ category.title }}
       </div>
     {% endfor %}
