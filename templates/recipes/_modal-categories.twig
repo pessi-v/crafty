@@ -7,7 +7,7 @@
   {% if categories|length %}
     <div class="categories-modal__categories flex flex-wrap">
       {% for category in categories %}
-        <div class="recipe-categories__tag clickable" data-category-slug="{{ category.slug }}">
+        <div class="recipe-categories__tag clickable capitalize" data-category-slug="{{ category.slug }}">
           {{ category.title }}
         </div>
       {% endfor %}
