@@ -8,11 +8,28 @@ fieldLayouts:
           -
             dateAdded: '2025-12-05T23:49:56+00:00'
             elementCondition: null
-            template: radio.twig
+            template: _radio.twig
             templateMode: site
             type: craft\fieldlayoutelements\Template
             uid: 61c8abd8-4c36-46f7-bd25-f05614e76c0a
             userCondition: null
+            width: 100
+          -
+            dateAdded: '2025-12-20T17:13:46+00:00'
+            editCondition: null
+            elementCondition: null
+            fieldUid: d4517b8b-4615-4a74-807f-2ed569497bb2 # showRadioWidget
+            handle: null
+            includeInCards: false
+            instructions: null
+            label: null
+            providesThumbs: false
+            required: false
+            tip: null
+            type: craft\fieldlayoutelements\CustomField
+            uid: 1722c454-440d-4b1f-b313-285be88e4cfa
+            userCondition: null
+            warning: null
             width: 100
         name: Content
         uid: 5e087813-ed2b-42f9-a842-c3f9748f34b1

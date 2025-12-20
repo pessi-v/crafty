@@ -302,4 +302,19 @@ web_extra_daemons:
 # See https://docs.ddev.com/en/stable/users/extend/custom-commands/ for more
 # information on the commands that can be extended and the tasks you can define
 # for them. Example:
-#hooks:
+hooks:
+  post-start:
+    - exec: |
+        if ! supervisorctl status webextradaemons:vite | grep -q RUNNING; then
+          echo ""
+          echo "⚠️  WARNING: Vite dev server failed to start!"
+          echo "This usually happens when node_modules contains platform-specific packages"
+          echo "from a different OS (e.g., macOS packages in a Linux container)."
+          echo ""
+          echo "To fix this, run the following commands:"
+          echo ""
+          echo "  ddev exec \"rm -rf node_modules package-lock.json\""
+          echo "  ddev exec \"npm install\""
+          echo "  ddev restart"
+          echo ""
+        fi

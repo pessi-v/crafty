@@ -36,7 +36,10 @@
 			{% endblock %}
 		</main>
 		<footer>
-			{% include '_radio.twig' %}
+			{% set radioSettings = craft.globalSets().handle('radio').one() %}
+			{% if radioSettings and radioSettings.showradiowidget %}
+				{% include '_radio.twig' %}
+			{% endif %}
 		</footer>
 	</body>
 </html>
