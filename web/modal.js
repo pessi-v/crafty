@@ -6,6 +6,7 @@ let modalConfig = {};
 let isClosing = false; // Flag to prevent immediate reopening after close
 let isHandlingPopstate = false; // Flag to prevent infinite loops with history navigation
 let modalHistoryDepth = 0; // Track how many history entries the modal has created
+let modalOpenedViaBackButton = false; // Track if modal was restored via back navigation
 
 // Initialize the modal system
 export function initModal(config) {
@@ -16,17 +17,19 @@ export function initModal(config) {
   window.addEventListener("popstate", function (e) {
     isHandlingPopstate = true;
 
+    // Check if we just closed - don't restore if so
+    const dialog = getModalDialog();
+
     if (e.state && e.state.modalConfig) {
       // Restore modal from history state
+      modalOpenedViaBackButton = true; // Mark as restored via navigation
       restoreModalFromState(e.state);
-      // Don't update modalHistoryDepth here - we track total depth from modal start,
-      // not the current position in history
     } else {
       // No modal state, close modal if open
-      const dialog = getModalDialog();
       if (dialog && dialog.shown) {
         dialog.hide();
         modalHistoryDepth = 0; // Reset depth when fully closed
+        modalOpenedViaBackButton = false;
       }
     }
 
@@ -44,26 +47,23 @@ export function initModal(config) {
   if (modalElement) {
     // Use the plugin's built-in hide event
     modalElement.addEventListener("hide", function (event) {
+      // Mark that we're closing to prevent any restoration attempts
+      isClosing = true;
+
       // Only modify history if this is a user-initiated close (not from popstate)
       if (!isHandlingPopstate) {
-        // Check the current history state for how far back to go
-        const currentState = window.history.state;
-        const stepsToGoBack = currentState && currentState.modalHistoryDepth ? currentState.modalHistoryDepth : 0;
-
-        if (stepsToGoBack > 0) {
-          // Go back through all modal history entries at once
-          isHandlingPopstate = true; // Prevent infinite recursion
-          window.history.go(-stepsToGoBack);
-          modalHistoryDepth = 0;
-          // Reset flag after navigation completes
-          setTimeout(() => {
-            isHandlingPopstate = false;
-          }, 100);
-        } else {
-          // No modal state in history, just reset URL
-          resetURL();
-        }
+        // ALWAYS just close and clean URL - no history navigation
+        // This prevents loops and ensures modal always closes when user wants it to
+        const cleanURL = window.location.pathname;
+        window.history.replaceState({}, "", cleanURL);
+        modalOpenedViaBackButton = false;
+        modalHistoryDepth = 0;
       }
+
+      // Reset closing flag after modal is fully hidden
+      setTimeout(() => {
+        isClosing = false;
+      }, 300);
     });
   }
 
@@ -166,6 +166,7 @@ async function openModal(config) {
 
   // Reset history depth when opening a fresh modal
   modalHistoryDepth = 0;
+  modalOpenedViaBackButton = false; // This is a fresh open, not via back button
 
   // Store the config for back navigation
   currentModalState = {
@@ -184,7 +185,8 @@ async function openModal(config) {
   }
 
   // Show modal using plugin API
-  if (dialog) {
+  // Double-check we're not in closing state before showing
+  if (dialog && !isClosing) {
     console.log("opening modal!");
     dialog.show();
   }
@@ -486,11 +488,15 @@ async function restoreModalFromState(state) {
       currentRecipeSlug: state.recipeSlug,
     };
 
-    if (!dialog.shown) {
+    if (!dialog.shown && !isClosing) {
       await displayRecipeList(state.modalConfig);
-      dialog.show();
+      if (!isClosing) {
+        dialog.show();
+      }
     }
-    await showRecipeDetailBySlug(state.recipeSlug);
+    if (!isClosing) {
+      await showRecipeDetailBySlug(state.recipeSlug);
+    }
   } else if (state.modalConfig) {
     // Restore list or form view
     currentModalState = {
@@ -521,6 +527,7 @@ async function restoreModalFromURL() {
 
   // Reset depth when restoring from URL (no history entries created yet)
   modalHistoryDepth = 0;
+  modalOpenedViaBackButton = false; // Initial page load, not via back button
 
   // If only recipe slug is provided (no cravings context)
   if (recipeSlug && !cravings) {
@@ -531,8 +538,12 @@ async function restoreModalFromURL() {
     };
 
     const dialog = getModalDialog();
-    await showRecipeDetailBySlug(recipeSlug);
-    dialog.show();
+    if (!isClosing) {
+      await showRecipeDetailBySlug(recipeSlug);
+      if (!isClosing) {
+        dialog.show();
+      }
+    }
     return;
   }
 
@@ -575,16 +586,20 @@ async function restoreModalFromURL() {
 
   const dialog = getModalDialog();
 
-  if (config.type === "list") {
-    await displayRecipeList(config);
-  } else if (config.type === "form") {
-    await displayForm(config);
-  }
+  if (!isClosing) {
+    if (config.type === "list") {
+      await displayRecipeList(config);
+    } else if (config.type === "form") {
+      await displayForm(config);
+    }
 
-  dialog.show();
+    if (!isClosing) {
+      dialog.show();
+    }
 
-  // If there's a recipe slug, show the detail view
-  if (recipeSlug) {
-    await showRecipeDetailBySlug(recipeSlug);
+    // If there's a recipe slug, show the detail view
+    if (recipeSlug && !isClosing) {
+      await showRecipeDetailBySlug(recipeSlug);
+    }
   }
 }
