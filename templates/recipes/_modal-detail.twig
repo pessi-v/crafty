@@ -1,39 +1,41 @@
 {# Recipe detail view for modal #}
 {# Expected variables: recipe, listTitle (optional) #}
 
-{% if listTitle %}
-  <button class="modal-back-button" data-action="back">Back to {{ listTitle }}</button>
-{% endif %}
-
-<h1 class="modal-title">{{ recipe.title }}</h1>
-
-{% set categories = recipe.recipeCategories.all() %}
-{% if categories|length %}
-  <div class="recipe-categories">
-    {% for category in categories %}
-      <div class="recipe-category-tag clickable" data-category-slug="{{ category.slug }}">
-        {{ category.title }}
-      </div>
-    {% endfor %}
-  </div>
-{% endif %}
-
-<div class="modal-body">
-  {% if recipe.recipeContent|length %}
-    {% for block in recipe.recipeContent.all() %}
-      {% if block.type.handle == 'text' %}
-        <p>{{ block.text|nl2br }}</p>
-      {% elseif block.type.handle == 'image' %}
-        {% if block.image|length %}
-          {% for img in block.image.all() %}
-            <img src="{{ img.url }}"
-                 alt="{{ img.title ?? '' }}"
-                 style="max-width: 100%; height: auto; margin: 20px 0; border-radius: 10px;">
-          {% endfor %}
-        {% endif %}
-      {% endif %}
-    {% endfor %}
-  {% else %}
-    <p>No content available</p>
+<div class="flex flex-col gap-4">
+  {% if listTitle %}
+    <button class="modal__back-button" data-action="back">Back to {{ listTitle }}</button>
   {% endif %}
+
+  <h2 class="capitalize text-4xl">{{ recipe.title }}</h2>
+
+  {% set categories = recipe.recipeCategories.all() %}
+  {% if categories|length %}
+    <div class="recipe-categories">
+      {% for category in categories %}
+        <div class="recipe-categories__tag clickable" data-category-slug="{{ category.slug }}">
+          {{ category.title }}
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <div class="modal-body">
+    {% if recipe.recipeContent|length %}
+      {% for block in recipe.recipeContent.all() %}
+        {% if block.type.handle == 'text' %}
+          <p>{{ block.text|nl2br }}</p>
+        {% elseif block.type.handle == 'image' %}
+          {% if block.image|length %}
+            {% for img in block.image.all() %}
+              <img src="{{ img.url }}"
+                  alt="{{ img.title ?? '' }}"
+                  style="max-width: 100%; height: auto; margin: 20px 0; border-radius: 10px;">
+            {% endfor %}
+          {% endif %}
+        {% endif %}
+      {% endfor %}
+    {% else %}
+      <p>No content available</p>
+    {% endif %}
+  </div>
 </div>

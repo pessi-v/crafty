@@ -1,0 +1,366 @@
+@import "tailwindcss";
+
+/* Tailwind v4 Theme Configuration */
+@theme {
+  /* Typography */
+  --font-system-ui: system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-technical: monospace;
+
+  /* Layout spacing */
+  --spacing-site-gutter: 2rem;
+  --spacing-site-section: 6rem;
+
+  /* Layout dimensions */
+  --layout-site-width: 40rem;
+
+  /* Cursor */
+  /* cursor: url(<file>) left-offset top-offset, fallback cursor; */
+  --cursor-default: url("/cursor_empty.png") 20 10, auto;
+  --cursor-pointer: url("/cursor_black.png") 23 10, auto;
+  --cursor-click: url("/cursor_blue.png"), auto;
+  --cursor-click: url("/cursor_black_click.png") 35 30, auto;
+}
+
+@layer base {
+  /* CSS Reset from styles.css */
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    cursor: var(--cursor-default);
+  }
+
+  * {
+    padding: 0;
+    margin: 0;
+    cursor: var(--cursor-default);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      interpolate-size: allow-keywords;
+    }
+  }
+
+  body {
+    line-height: 1.4;
+    -webkit-font-smoothing: antialiased;
+    cursor: var(--cursor-default);
+    color: var(--color-base);
+    font-family: var(--font-system-ui);
+    margin: 0;
+    overflow: hidden;
+    padding: var(--spacing-site-gutter)
+      max(
+        var(--spacing-site-gutter),
+        calc((100vw - var(--layout-site-width)) / 2)
+      );
+  }
+
+  img,
+  picture,
+  video,
+  canvas,
+  svg {
+    display: block;
+    max-width: 100%;
+  }
+
+  input,
+  button,
+  textarea,
+  select {
+    font: inherit;
+    cursor: var(--cursor-pointer);
+  }
+
+  input:active,
+  button:active,
+  textarea:active,
+  select:active {
+    font: inherit;
+    cursor: var(--cursor-click);
+  }
+
+  textarea {
+    resize: none;
+  }
+
+  p,
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    overflow-wrap: break-word;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    text-wrap: balance;
+  }
+
+  h1 {
+    font-size: 1.125rem;
+    line-height: 1.75rem;
+  }
+
+  #root,
+  #__next {
+    isolation: isolate;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+    cursor: var(--cursor-pointer);
+  }
+}
+
+:root {
+  --color-base: #222;
+  --color-highlight: #405ab0ff;
+  --color-muted: #aaa;
+}
+
+/* Animation container styles from animation.css */
+#animation-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+#animation-container canvas {
+  display: block;
+}
+
+#animation-container canvas.pointer {
+  cursor: var(--cursor-pointer);
+}
+
+#animation-container canvas.clicking {
+  cursor: var(--cursor-click);
+}
+
+/* Override modal plugin styles */
+.snippets-modal__window {
+  background: #f5f5f0 !important;
+  border: 2px solid #000;
+  border-radius: 20px !important;
+  max-height: 80vh !important;
+  min-height: 80vh !important;
+  width: 35vw !important;
+  max-width: 1000px !important;
+  opacity: 0.8 !important;
+  animation: none !important;
+}
+
+.snippets-modal__container {
+  z-index: 10000 !important;
+}
+
+.snippets-modal__container .snippets-modal__header {
+  display: none;
+}
+
+.snippets-modal__container .snippets-modal__overlay {
+  pointer-events: auto !important;
+}
+
+.snippets-modal__container .snippets-modal__content {
+  line-height: 1.4 !important;
+}
+
+.snippets-modal__container .snippets-modal__close {
+  display: none;
+}
+
+.snippets-modal__container ul,
+.snippets-modal__container ol {
+  padding-left: 1rem !important;
+  /* text-transform: capitalize;
+  display: grid;
+  gap: 1rem;
+  */
+  list-style-type: disc;
+}
+
+/* Content styles */
+
+.recipe-categories {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.recipe-categories__tag {
+  border: 1px solid #a6a6a6;
+  border-radius: 4px;
+  padding-left: 4px;
+  padding-right: 4px;
+  padding-bottom: 1px;
+  width: auto;
+  font-size: smaller;
+  transition: all 0.2s ease;
+}
+
+.clickable {
+  cursor: var(--cursor-pointer);
+}
+
+.clickable:active {
+  cursor: var(--cursor-click);
+}
+
+.recipe-categories__tag:hover {
+  background-color: #e0e0e0;
+  border-color: #666;
+  transform: translateY(-1px);
+}
+
+.modal__back-button::before {
+  content: "←";
+  font-size: 1.2em;
+}
+
+.notice {
+  background: #d4edda;
+  border: 1px solid #c3e6cb;
+  color: #155724;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border-radius: 4px;
+}
+
+.error {
+  background: #f8d7da;
+  border: 1px solid #f5c6cb;
+  color: #721c24;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border-radius: 4px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.form-label {
+  display: block;
+  font-weight: bold;
+}
+
+.form-input {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.categories-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+/* Toggleable category pill styles */
+
+.category-pill-input {
+  display: none;
+}
+
+.category-pill-tag {
+  display: inline-block;
+  border: 1px solid #a6a6a6;
+  border-radius: 4px;
+  padding-left: 4px;
+  padding-right: 4px;
+  padding-bottom: 1px;
+  font-size: smaller;
+  text-transform: capitalize;
+  /* transition: all 0.2s ease; */
+  background-color: transparent;
+}
+
+.category-pill-label:hover .category-pill-tag {
+  background-color: #e0e0e0;
+  border-color: #666;
+  /* transform: translateY(-1px); */
+}
+
+.category-pill-input:checked + .category-pill-tag {
+  background-color: var(--color-highlight);
+  border-color: var(--color-highlight);
+  color: white;
+}
+
+.category-pill-label:hover .category-pill-input:checked + .category-pill-tag {
+  background-color: var(--color-base);
+  border-color: var(--color-base);
+}
+
+.submit-button {
+  padding: 0.75rem 2rem;
+  background: #b48595;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-weight: bold;
+}
+
+.form-note {
+  color: var(--color-muted);
+}
+
+.categories-modal__categories {
+  display: flex;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.category-card {
+  border: 2px solid #a6a6a6;
+  border-radius: 8px;
+  padding: 1rem;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+
+.category-card.clickable {
+  cursor: var(--cursor-pointer);
+}
+
+.category-card.clickable:hover {
+  background-color: #e0e0e0;
+  border-color: #666;
+  transform: translateY(-2px);
+}
+
+.category-card h3 {
+  margin: 0 0 0.5rem 0;
+  text-transform: capitalize;
+}
+
+.category-card .recipe-count {
+  color: #666;
+  font-size: 0.9rem;
+}

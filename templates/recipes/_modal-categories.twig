@@ -1,16 +1,18 @@
 {# All categories view for modal #}
 {# Expected variables: categories, listTitle #}
 
-<h1 class="modal-title">{{ listTitle }}</h1>
+<div class="flex flex-col gap-4">
+  <h2 class="capitalize text-4xl">{{ listTitle }}</h2>
 
-{% if categories|length %}
-  <div class="categories-grid">
-    {% for category in categories %}
-      <div class="recipe-category-tag clickable" data-category-slug="{{ category.slug }}">
-        <h3>{{ category.title }}</h3>
-      </div>
-    {% endfor %}
-  </div>
-{% else %}
-  <p>No categories found</p>
-{% endif %}
+  {% if categories|length %}
+    <div class="categories-modal__categories flex flex-wrap">
+      {% for category in categories %}
+        <div class="recipe-categories__tag clickable" data-category-slug="{{ category.slug }}">
+          {{ category.title }}
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p>No categories found</p>
+  {% endif %}
+</div>

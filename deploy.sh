@@ -71,8 +71,6 @@ info "Connecting to ${SERVER} and deploying..."
 
 # Use SSH agent forwarding to allow git operations on remote server
 ssh -A "${REMOTE_USER}@${SERVER}" "bash -s" -- "${REMOTE_PATH}" "${BRANCH}" << 'ENDSSH'
-set -e
-
 # Get the remote path and branch from the arguments
 REMOTE_PATH="$1"
 BRANCH="$2"
@@ -100,26 +98,46 @@ git pull origin "${BRANCH}"
 info "rebuilding Dockerimage"
 docker compose build php
 
-info "restarting with new Dockerimage"
+info "stopping containers to clear OPcache"
+docker compose down
+
+info "starting containers with new Dockerimage"
 docker compose up -d
 
 info "Installing Composer dependencies (production mode)..."
-docker compose exec -T --user www-data php composer install --no-dev --optimize-autoloader --no-interaction
+docker compose exec -T --user www-data php composer install --no-dev --optimize-autoloader --no-interaction < /dev/null || echo "WARNING: Composer install had non-zero exit"
+
+info "Building frontend assets..."
+mkdir -p web/static/dist
+npm install --no-audit --no-fund || echo "WARNING: npm install had issues"
+npm run build || { echo "ERROR: npm build failed!"; exit 1; }
+
+info "Verifying build artifacts..."
+MANIFEST_FILE="web/static/dist/manifest.json"
+if [ ! -f "$MANIFEST_FILE" ]; then
+    echo "ERROR: manifest.json not found at $MANIFEST_FILE"
+    exit 1
+fi
+
+# Check if manifest was modified in the last 60 seconds
+if [ $(find "$MANIFEST_FILE" -mmin -1 2>/dev/null | wc -l) -eq 0 ]; then
+    echo "ERROR: manifest.json was not updated by the build!"
+    echo "Last modified: $(stat -c '%y' "$MANIFEST_FILE" 2>/dev/null || stat -f '%Sm' "$MANIFEST_FILE")"
+    exit 1
+fi
+info "Build verified - manifest.json updated successfully"
+
+info "Setting permissions on built assets..."
+chown -R www-data:www-data web/static
 
 info "Running Craft migrations..."
-docker compose exec -T --user www-data php ./craft migrate/all --interactive=0 || echo "No migrations to run"
+docker compose exec -T --user www-data php ./craft migrate/all --interactive=0 < /dev/null || echo "No migrations to run"
 
 info "Applying project config..."
-docker compose exec -T --user www-data php ./craft project-config/apply --force || echo "No project config changes"
+docker compose exec -T --user www-data php ./craft project-config/apply --force < /dev/null || echo "No project config changes"
 
 info "Clearing Craft caches..."
-docker compose exec -T --user www-data php ./craft clear-caches/all
-
-info "Restarting PHP-FPM..."
-docker compose restart php
-
-info "Restarting Nginx..."
-docker compose restart nginx
+docker compose exec -T --user www-data php ./craft clear-caches/all < /dev/null
 
 info "Deployment complete!"
 ENDSSH

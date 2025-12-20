@@ -41,6 +41,11 @@ RUN apt-get update && apt-get install -y \
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
+# Install Node.js and npm
+RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
+    && apt-get install -y nodejs \
+    && rm -rf /var/lib/apt/lists/*
+
 # Set working directory
 WORKDIR /var/www/html
 
@@ -83,6 +88,9 @@ RUN mkdir -p /var/www/html/storage/runtime \
 
 # Install composer dependencies as www-data user
 RUN su www-data -s /bin/sh -c "composer install --no-dev --optimize-autoloader --no-interaction"
+
+# Note: npm build happens during deployment, not in Docker image
+# This is because the web/ directory is mounted from the host
 
 # Create a simple entrypoint script to ensure permissions on startup
 RUN echo '#!/bin/sh' > /docker-entrypoint.sh \

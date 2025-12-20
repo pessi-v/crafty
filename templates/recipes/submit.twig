@@ -1,90 +1,93 @@
 {% extends "_layout" %}
 
 {% block content %}
-<div id="recipe-submit-container" class="flex-column">
-  <h1 class="modal-title">Submit a Recipe</h1>
+<div id="recipe-submit-container">
+  <div class="flex flex-col gap-4">
+    <h2 class="capitalize text-4xl">Submit a Recipe</h2>
 
-  {% if craft.app.session.hasFlash('notice') %}
-    <div class="notice">
-      {{ craft.app.session.getFlash('notice') }}
-    </div>
-  {% endif %}
-
-  {% if craft.app.session.hasFlash('error') %}
-    <div class="error">
-      {{ craft.app.session.getFlash('error') }}
-    </div>
-  {% endif %}
-
-  <form method="post" enctype="multipart/form-data" id="recipe-form" autocomplete="off">
-    {{ csrfInput() }}
-    {{ actionInput('recipesmodule/recipes/submit') }}
-
-    <div class="flex-column">
-      <div class="form-group">
-        <label for="title" class="form-label">
-          Title
-        </label>
-        <input
-          type="text"
-          id="title"
-          name="title"
-          required
-          autocomplete="off"
-          class="form-input"
-        >
+    {% if craft.app.session.hasFlash('notice') %}
+      <div class="notice">
+        {{ craft.app.session.getFlash('notice') }}
       </div>
+    {% endif %}
 
-      <div class="form-group">
-        <label class="form-label">Categories</label>
-        {% set allCategories = craft.categories().group('labels').all() %}
-        <div class="categories-container">
-          {% for category in allCategories %}
-            <label class="category-checkbox-label">
-              <input
-                type="checkbox"
-                name="categories[]"
-                value="{{ category.id }}"
-              >
-              {{ category.title }}
-            </label>
-          {% endfor %}
+    {% if craft.app.session.hasFlash('error') %}
+      <div class="error">
+        {{ craft.app.session.getFlash('error') }}
+      </div>
+    {% endif %}
+
+    <form method="post" enctype="multipart/form-data" id="recipe-form" autocomplete="off">
+      {{ csrfInput() }}
+      {{ actionInput('recipesmodule/recipes/submit') }}
+
+      <div class="flex flex-col gap-3">
+        <div class="form-group">
+          <label for="title" class="form-label">
+            Title
+          </label>
+          <input
+            type="text"
+            id="title"
+            name="title"
+            required
+            autocomplete="off"
+            class="form-input"
+          >
         </div>
+
+        <div class="form-group">
+          <label class="form-label">Categories</label>
+          {% set allCategories = craft.categories().group('labels').all() %}
+          <div class="recipe-categories">
+            {% for category in allCategories %}
+              <label class="category-pill-label clickable inline-block">
+                <input
+                  type="checkbox"
+                  name="categories[]"
+                  value="{{ category.id }}"
+                  class="category-pill-input"
+                >
+                <span class="category-pill-tag clickable">{{ category.title }}</span>
+              </label>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Recipe Content</label>
+          <input type="hidden" name="contentBlocks[0][type]" value="text">
+          <textarea
+            name="contentBlocks[0][text]"
+            rows="4"
+            class="form-input"
+          ></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="salasana" class="form-label">
+            Password
+          </label>
+          <input
+            type="salasana"
+            id="salasana"
+            name="salasana"
+            required
+            autocomplete="off"
+            class="form-input"
+          >
+
+        </div>
+
+        <button type="submit" class="submit-button">
+          Submit
+        </button>
+        <p class="form-note text-sm">
+          <em>Your recipe will be reviewed before it appears on the site. The Password is 'changeme'.</em>
+        </p>
       </div>
-
-      <div class="form-group">
-        <label class="form-label">Recipe Content</label>
-        <input type="hidden" name="contentBlocks[0][text]" value="text">
-        <textarea
-          name="contentBlocks[0][text]"
-          rows="4"
-          class="form-input"
-        ></textarea>
-      </div>
-
-      <div class="form-group">
-        <label for="salasana" class="form-label">
-          Password
-        </label>
-        <input
-          type="salasana"
-          id="salasana"
-          name="salasana"
-          required
-          autocomplete="off"
-          class="form-input"
-        >
-
-      </div>
-
-      <button type="submit" class="submit-button">
-        Submit
-      </button>
-      <p class="form-note">
-        <em>Your recipe will be reviewed before it appears on the site.</em>
-      </p>
-    </div>
-  </form>
+    </form>
+  </div>
 </div>
 
 {% endblock %}
