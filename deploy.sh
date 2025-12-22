@@ -92,6 +92,12 @@ info "Current directory: $(pwd)"
 info "Checking git status..."
 git status
 
+info "Fetching latest changes from git..."
+git fetch origin
+
+info "Checking out branch: ${BRANCH}..."
+git checkout "${BRANCH}"
+
 info "Pulling latest code from git (branch: ${BRANCH})..."
 git pull origin "${BRANCH}"
 
