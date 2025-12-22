@@ -156,6 +156,82 @@ async function fetchModalContent(params) {
   return await response.text();
 }
 
+// Debounce utility function
+function debounce(func, wait) {
+  let timeout;
+  return function executedFunction(...args) {
+    const later = () => {
+      clearTimeout(timeout);
+      func(...args);
+    };
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+  };
+}
+
+// Perform recipe search via AJAX
+async function performSearch(searchQuery) {
+  const resultsContainer = document.getElementById('search-results-container');
+  const loadingIndicator = document.querySelector('.modal-search__loading');
+
+  if (!resultsContainer) return;
+
+  // Show loading state
+  if (loadingIndicator) {
+    loadingIndicator.classList.remove('hidden');
+  }
+
+  try {
+    // Fetch search results using existing fetchModalContent function
+    const html = await fetchModalContent({
+      view: 'search',
+      searchQuery: searchQuery
+    });
+
+    resultsContainer.innerHTML = html;
+  } catch (error) {
+    console.error('Error performing search:', error);
+    resultsContainer.innerHTML = '<p class="error">Error searching recipes. Please try again.</p>';
+  } finally {
+    // Hide loading state
+    if (loadingIndicator) {
+      loadingIndicator.classList.add('hidden');
+    }
+  }
+}
+
+// Create debounced search function (300ms delay)
+const debouncedSearch = debounce(performSearch, 300);
+
+// Initialize search input listener
+function initSearchInput() {
+  const searchInput = document.getElementById('recipe-search-input');
+  if (!searchInput) return;
+
+  searchInput.addEventListener('input', function(e) {
+    const query = e.target.value.trim();
+
+    // Clear results if query is empty
+    if (!query) {
+      const resultsContainer = document.getElementById('search-results-container');
+      if (resultsContainer) {
+        resultsContainer.innerHTML = '';
+      }
+      return;
+    }
+
+    // Perform debounced search
+    debouncedSearch(query);
+  });
+
+  // Handle Enter key to prevent form submission behavior
+  searchInput.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+    }
+  });
+}
+
 // Modal functions
 async function openModal(config) {
   // Prevent opening if modal is already open or closing
@@ -206,6 +282,9 @@ async function displayRecipeList(config) {
 
     // Update modal state
     currentModalState.view = "list";
+
+    // Initialize search input if present
+    initSearchInput();
   } catch (error) {
     console.error("Error loading recipe list:", error);
     modalInner.innerHTML = "<p>Error loading recipes. Please try again.</p>";
