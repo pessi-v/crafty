@@ -133,9 +133,6 @@ if [ $(find "$MANIFEST_FILE" -mmin -1 2>/dev/null | wc -l) -eq 0 ]; then
 fi
 info "Build verified - manifest.json updated successfully"
 
-info "Setting permissions on built assets..."
-chown -R www-data:www-data web/static
-
 info "Running Craft migrations..."
 docker compose exec -T --user www-data php ./craft migrate/all --interactive=0 < /dev/null || echo "No migrations to run"
 
