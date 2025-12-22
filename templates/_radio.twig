@@ -1,20 +1,14 @@
 <style>
   .radio-widget {
-    position: absolute;
-    right: 50px;
-    bottom: 50px;
-    /* opacity: 0.75; */
-    width: 100px;
-    height: 89px;
-    /* background: #f5f5f0; */
-    border: 4px solid #000;
-    border-radius: 20px;
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    --color-btn-accent: #405ab0ff;
+  
+    /* --color-btn-accent:rgba(193, 71, 134, 0.8); */
+    --color-btn-accent:rgba(146, 78, 111, 0.8);
+    /* --color-btn-accent: #c14786ff; */
+    /* --color-btn-accent: #405ab0ff; */
     color: black;
-    cursor: var(--cursor-pointer);
 
     /* reset */
     line-height: 0 !important;
@@ -25,70 +19,55 @@
     align-items: center;
     justify-content: center;
     flex-grow: 4;
-    cursor: var(--cursor-pointer);
 
     /* reset */
     line-height: 0 !important;
   }
 
-  .radio-widget__play-pause-btn:active {
-    cursor: var(--cursor-click);
-  }
-
   .radio-widget__play-pause-btn {
-    width: 100%;
-    height: 100%;
-    font-size: 40px;
+    line-height: 0 !important;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     font-weight: 600;
     transition: transform 0.1s ease;
-    cursor: var(--cursor-pointer);
-  }
-
-  .radio-widget__play-pause-btn.playing {
-    background: var(--color-btn-accent);
   }
 
   .radio-widget__channels {
     display: flex;
-    border-top: 4px solid #000;
+    border-top: inherit;
     flex-grow: 2;
-    cursor: var(--cursor-pointer);
 
     /* reset */
     line-height: 0 !important;
   }
 
-  .radio-widget__channels-btn:active {
-    cursor: var(--cursor-click);
-  }
-
   .radio-widget__channels-btn {
     flex: 1;
-    font-size: 12px;
-    font-weight: bold;
-    border-right: 4px solid #000;
-    cursor: var(--cursor-pointer);
+    line-height: 0 !important;
+    border-color: inherit;
   }
 
   .radio-widget__channels-btn:last-child {
     border-right: none;
   }
-
+  
   .radio-widget__channels-btn.active {
+    background: var(--color-btn-accent);
+  }
+
+  .playing {
     background: var(--color-btn-accent);
   }
 </style>
 
 
-<div class="radio-widget">
-  <div class="radio-widget__play-pause">
-    <button class="radio-widget__play-pause-btn" id="playPauseBtn">▶</button>
+<div class="radio-widget left-4 bottom-4 md:left-9 md:bottom-9 absolute w-16 h-14 md:w-24 md:h-20 border-2 rounded-xl md:border-4 md:rounded-2xl">
+  <div class="radio-widget__play-pause bg-opacity-10 text-3xl md:text-4xl clickable" id="playPauseBtn">
+    <button class="radio-widget__play-pause-btn clickable">▶</button>
   </div>
-  <div class="radio-widget__channels">
-    <button class="radio radio-widget__channels-btn active" data-channel="1">1</button>
-    <button class="radio radio-widget__channels-btn" data-channel="2">2</button>
-    <button class="radio radio-widget__channels-btn" data-channel="3">3</button>
+  <div class="radio-widget__channels bg-opacity-90">
+    <button class="radio radio-widget__channels-btn bg-opacity-10 active border-r-2 md:border-r-4 text-sm md:text-lg font-bold" data-channel="1">1</button>
+    <button class="radio radio-widget__channels-btn bg-opacity-10 text-sm md:text-lg font-bold" data-channel="2">2</button>
+    {# <button class="radio radio-widget__channels-btn" data-channel="3">3</button> #}
   </div>
 </div>
 
