@@ -14,7 +14,7 @@ Features:
 - Modals have navigation buttons (back/forward)
 - Also browser navigation buttons correctly move back and forth in the modal history
 - Custom cursor
-- A radio widget, modeled as a Global element that can me toggled on/off from the Craft CMS admin
+- A radio widget, modeled as a Global element that can be toggled on/off from the Craft CMS admin
 - Radio widget streams 2 online radio channels (NTS Radio)
 - An SVG hamburger menu with a neat hover effect
 - Actual recipes that I like to cook
