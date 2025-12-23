@@ -11,7 +11,7 @@
   'pig': 'meat',
   'eggplant': ['vegetarian', 'vegan'],
   'peapod': 'tofu',
-  'garlic': 'garlicky'
+  'garlicky': 'garlicky'
 } %}
 
 {% if view == 'categories' %}
@@ -45,6 +45,23 @@
     }).all() %}
   {% endif %}
 
+{% elseif view == 'search' %}
+  {# Query recipes by search term with fuzzy search enabled #}
+  {% set searchQuery = craft.app.request.getParam('searchQuery') %}
+
+  {% if searchQuery and searchQuery|trim %}
+    {# Use Craft's native search method - searches title and recipeContent by default #}
+    {% set recipes = craft.entries()
+      .section('recipes')
+      .search({
+        query: searchQuery,
+        subLeft: true,
+      })
+      .all() %}
+  {% else %}
+    {% set recipes = [] %}
+  {% endif %}
+
 {% else %}
   {# Generic category query - treat view as category slug #}
   {% set category = craft.categories().slug(view).one() %}
@@ -66,6 +83,11 @@
   {% include 'recipes/_modal-categories' with {
     categories: categories,
     listTitle: listTitle
+  } %}
+{% elseif view == 'search' and recipes is defined %}
+  {% include 'recipes/_modal-search' with {
+    recipes: recipes,
+    searchQuery: searchQuery
   } %}
 {% elseif view != 'detail' and recipes is defined %}
   {% include 'recipes/_modal-list' with {

@@ -34,3 +34,6 @@ package-lock.json
 # Vite build output
 /web/static/dist/
 .vite/
+
+/web/burger.svg
+/web/cursor_empty_original.png
