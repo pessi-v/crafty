@@ -87,82 +87,58 @@ export function initAnimation(config) {
   let turnipPlanet = null;
 
   // Orbital parameters for each satellite
+  const orbitalRadius = 5.5;
+  const orbitalSpeed = 0.2;
+  const angleStep = (Math.PI * 2) / 7; // Evenly space 7 satellites
+
   const orbitalData = {
     chili: {
-      radius: 3.5,
-      speed: 0.2,
-      tilt: 0.1,
-      yOffset: 0.2,
-      startAngle: 0,
-      rotationX: 0.008,
-      rotationY: 0.012,
-      rotationZ: 0.003,
+      radius: orbitalRadius,
+      speed: orbitalSpeed,
+      startAngle: angleStep * 0,
+      spinSpeed: 0.002, // Slow clockwise spin
       model: null,
     },
     egg: {
-      radius: 4.5,
-      speed: 0.2,
-      tilt: -0.15,
-      yOffset: -0.3,
-      startAngle: Math.PI * 0.6, // ~108 degrees offset
-      rotationX: 0.005,
-      rotationY: 0.015,
-      rotationZ: 0.007,
+      radius: orbitalRadius,
+      speed: orbitalSpeed,
+      startAngle: angleStep * 1,
+      spinSpeed: -0.003, // Slow counter-clockwise spin
       model: null,
     },
     garlic: {
-      radius: 5.5,
-      speed: 0.2,
-      tilt: 0.05,
-      yOffset: 0.1,
-      startAngle: Math.PI * 1.2, // ~216 degrees offset
-      rotationX: 0.011,
-      rotationY: 0.006,
-      rotationZ: 0.004,
+      radius: orbitalRadius,
+      speed: orbitalSpeed,
+      startAngle: angleStep * 2,
+      spinSpeed: 0.0025, // Slow clockwise spin
       model: null,
     },
     pig: {
-      radius: 6.5,
-      speed: 0.2,
-      tilt: -0.08,
-      yOffset: 0.3,
-      startAngle: Math.PI * 0.3, // ~54 degrees offset
-      rotationX: 0.009,
-      rotationY: 0.013,
-      rotationZ: 0.002,
+      radius: orbitalRadius,
+      speed: orbitalSpeed,
+      startAngle: angleStep * 3,
+      spinSpeed: -0.002, // Slow counter-clockwise spin
       model: null,
     },
     eggplant: {
-      radius: 4.0,
-      speed: 0.2,
-      tilt: 0.12,
-      yOffset: -0.1,
-      startAngle: Math.PI * 1.5, // ~270 degrees offset
-      rotationX: 0.007,
-      rotationY: 0.01,
-      rotationZ: 0.008,
+      radius: orbitalRadius,
+      speed: orbitalSpeed,
+      startAngle: angleStep * 4,
+      spinSpeed: 0.0018, // Slow clockwise spin
       model: null,
     },
     peapod: {
-      radius: 7.0,
-      speed: 0.2,
-      tilt: -0.05,
-      yOffset: 0.0,
-      startAngle: Math.PI * 1.8, // ~324 degrees offset
-      rotationX: 0.006,
-      rotationY: 0.014,
-      rotationZ: 0.005,
+      radius: orbitalRadius,
+      speed: orbitalSpeed,
+      startAngle: angleStep * 5,
+      spinSpeed: -0.0028, // Slow counter-clockwise spin
       model: null,
     },
     hamburger: {
-      radius: 5.0,
-      speed: 0.2,
-      tilt: 0.18,
-      yOffset: 0.4,
-      startAngle: Math.PI * 0.9, // ~162 degrees offset
-      rotationX: 0.01,
-      rotationY: 0.008,
-      rotationZ: 0.009,
+      radius: orbitalRadius,
+      speed: orbitalSpeed,
+      startAngle: angleStep * 6,
+      spinSpeed: 0.0022, // Slow clockwise spin
       model: null,
     },
   };
@@ -275,31 +251,13 @@ export function initAnimation(config) {
       if (satellite.model) {
         const angle = -time * satellite.speed + satellite.startAngle;
 
-        // Calculate orbital position
-        const x = Math.cos(angle) * satellite.radius;
-        const z = Math.sin(angle) * satellite.radius;
-        const y = satellite.yOffset + Math.sin(angle * 2) * 0.2; // Slight vertical wave
+        // Calculate orbital position in a stable circular orbit
+        satellite.model.position.x = Math.cos(angle) * satellite.radius;
+        satellite.model.position.y = 0; // Keep orbit in a flat horizontal plane
+        satellite.model.position.z = Math.sin(angle) * satellite.radius;
 
-        // Apply tilt to orbit
-        satellite.model.position.x =
-          x * Math.cos(satellite.tilt) - y * Math.sin(satellite.tilt);
-        satellite.model.position.y =
-          y * Math.cos(satellite.tilt) + x * Math.sin(satellite.tilt);
-        satellite.model.position.z = z;
-
-        // Rotate satellite on its own axis with unique tumbling pattern
-        satellite.model.rotation.x += satellite.rotationX;
-        satellite.model.rotation.y += satellite.rotationY;
-        satellite.model.rotation.z += satellite.rotationZ;
-
-        // Depth sorting for occlusion
-        // Calculate if satellite is behind planet
-        const distanceFromCamera = satellite.model.position.distanceTo(
-          camera.position
-        );
-        const planetDistanceFromCamera = turnipPlanet
-          ? turnipPlanet.position.distanceTo(camera.position)
-          : 0;
+        // Apply slow spin around Y-axis only (no tumbling)
+        satellite.model.rotation.y += satellite.spinSpeed;
 
         // Simple occlusion: if satellite is further and behind planet in Z
         if (
