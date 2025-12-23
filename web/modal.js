@@ -7,11 +7,15 @@ let isClosing = false; // Flag to prevent immediate reopening after close
 let isHandlingPopstate = false; // Flag to prevent infinite loops with history navigation
 let modalHistoryDepth = 0; // Track how many history entries the modal has created
 let modalOpenedViaBackButton = false; // Track if modal was restored via back navigation
+let maxModalHistoryDepth = 0; // Track the maximum depth reached to detect forward history
 
 // Initialize the modal system
 export function initModal(config) {
   console.log("modal initiation");
   modalConfig = config;
+
+  // Create and inject navigation buttons
+  createNavigationButtons();
 
   // Handle browser back/forward buttons
   window.addEventListener("popstate", function (e) {
@@ -21,6 +25,11 @@ export function initModal(config) {
     const dialog = getModalDialog();
 
     if (e.state && e.state.modalConfig) {
+      // Update depth from state to track our position in history
+      if (e.state.modalHistoryDepth !== undefined) {
+        modalHistoryDepth = e.state.modalHistoryDepth;
+      }
+
       // Restore modal from history state
       modalOpenedViaBackButton = true; // Mark as restored via navigation
       restoreModalFromState(e.state);
@@ -29,9 +38,13 @@ export function initModal(config) {
       if (dialog && dialog.shown) {
         dialog.hide();
         modalHistoryDepth = 0; // Reset depth when fully closed
+        maxModalHistoryDepth = 0; // Reset max depth as well
         modalOpenedViaBackButton = false;
       }
     }
+
+    // Update navigation button states
+    updateNavigationButtons();
 
     // Reset flag after a short delay to allow hide event to complete
     setTimeout(() => {
@@ -58,6 +71,8 @@ export function initModal(config) {
         window.history.replaceState({}, "", cleanURL);
         modalOpenedViaBackButton = false;
         modalHistoryDepth = 0;
+        maxModalHistoryDepth = 0;
+        updateNavigationButtons();
       }
 
       // Reset closing flag after modal is fully hidden
@@ -138,6 +153,71 @@ export function isModalOpen() {
 function getModalDialog() {
   const modalElement = document.getElementById("recipe-modal");
   return modalElement ? modalElement._dialog : null;
+}
+
+// Create and inject navigation buttons into the modal
+function createNavigationButtons() {
+  const modalElement = document.getElementById("recipe-modal");
+  if (!modalElement) return;
+
+  // Find the modal content container
+  const modalContent = modalElement.querySelector(".snippets-modal__content");
+  if (!modalContent) return;
+
+  // Create navigation bar
+  const navBar = document.createElement("div");
+  navBar.id = "modal-nav-bar";
+  navBar.className = "modal-nav-bar";
+  navBar.innerHTML = `
+    <button id="modal-nav-back" class="modal-nav-button" aria-label="Go back" disabled>
+      <span class="modal-nav-button__icon">←</span>
+      <span class="modal-nav-button__label">Back</span>
+    </button>
+    <button id="modal-nav-forward" class="modal-nav-button" aria-label="Go forward" disabled>
+      <span class="modal-nav-button__label">Forward</span>
+      <span class="modal-nav-button__icon">→</span>
+    </button>
+  `;
+
+  // Insert navigation bar at the top of modal content
+  modalContent.insertBefore(navBar, modalContent.firstChild);
+
+  // Add event listeners
+  document.getElementById("modal-nav-back").addEventListener("click", function () {
+    if (!this.disabled) {
+      window.history.back();
+    }
+  });
+
+  document.getElementById("modal-nav-forward").addEventListener("click", function () {
+    if (!this.disabled) {
+      window.history.forward();
+    }
+  });
+}
+
+// Update navigation button states based on history
+function updateNavigationButtons() {
+  const backButton = document.getElementById("modal-nav-back");
+  const forwardButton = document.getElementById("modal-nav-forward");
+
+  if (!backButton || !forwardButton) return;
+
+  // Back button: enabled if we have modal history depth > 0
+  // This means we've navigated within the modal
+  if (modalHistoryDepth > 0) {
+    backButton.disabled = false;
+  } else {
+    backButton.disabled = true;
+  }
+
+  // Forward button: enabled if current depth < max depth
+  // This means we've gone back and there's forward history available
+  if (modalHistoryDepth < maxModalHistoryDepth) {
+    forwardButton.disabled = false;
+  } else {
+    forwardButton.disabled = true;
+  }
 }
 
 // Fetch rendered Twig template via AJAX
@@ -242,6 +322,7 @@ async function openModal(config) {
 
   // Reset history depth when opening a fresh modal
   modalHistoryDepth = 0;
+  maxModalHistoryDepth = 0;
   modalOpenedViaBackButton = false; // This is a fresh open, not via back button
 
   // Store the config for back navigation
@@ -265,6 +346,7 @@ async function openModal(config) {
   if (dialog && !isClosing) {
     console.log("opening modal!");
     dialog.show();
+    updateNavigationButtons();
   }
 }
 
@@ -527,6 +609,12 @@ function updateURLForModal(config) {
 
   const newURL = `${window.location.pathname}?${params.toString()}`;
   modalHistoryDepth++;
+
+  // Update max depth when we push new history (going forward)
+  if (modalHistoryDepth > maxModalHistoryDepth) {
+    maxModalHistoryDepth = modalHistoryDepth;
+  }
+
   window.history.pushState(
     {
       modalConfig: config,
@@ -536,6 +624,7 @@ function updateURLForModal(config) {
     "",
     newURL
   );
+  updateNavigationButtons();
 }
 
 function updateURLForRecipeDetail(recipeSlug) {
@@ -544,6 +633,12 @@ function updateURLForRecipeDetail(recipeSlug) {
 
   const newURL = `${window.location.pathname}?${params.toString()}`;
   modalHistoryDepth++;
+
+  // Update max depth when we push new history (going forward)
+  if (modalHistoryDepth > maxModalHistoryDepth) {
+    maxModalHistoryDepth = modalHistoryDepth;
+  }
+
   window.history.pushState(
     {
       modalConfig: currentModalState.config,
@@ -554,6 +649,7 @@ function updateURLForRecipeDetail(recipeSlug) {
     "",
     newURL
   );
+  updateNavigationButtons();
 }
 
 async function restoreModalFromState(state) {
@@ -606,6 +702,7 @@ async function restoreModalFromURL() {
 
   // Reset depth when restoring from URL (no history entries created yet)
   modalHistoryDepth = 0;
+  maxModalHistoryDepth = 0;
   modalOpenedViaBackButton = false; // Initial page load, not via back button
 
   // If only recipe slug is provided (no cravings context)
