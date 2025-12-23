@@ -36,3 +36,4 @@ package-lock.json
 .vite/
 
 /web/burger.svg
+/web/cursor_empty_original.png
