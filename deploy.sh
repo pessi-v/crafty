@@ -98,8 +98,8 @@ git fetch origin
 info "Checking out branch: ${BRANCH}..."
 git checkout "${BRANCH}"
 
-info "Pulling latest code from git (branch: ${BRANCH})..."
-git pull origin "${BRANCH}"
+info "Resetting to latest code from git (branch: ${BRANCH})..."
+git reset --hard origin/"${BRANCH}"
 
 info "rebuilding Dockerimage"
 docker compose build php
