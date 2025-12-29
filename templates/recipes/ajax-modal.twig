@@ -26,6 +26,15 @@
     .section('recipes')
     .all() %}
 
+{% elseif view == 'hamburger' %}
+  {# Query both categories and all recipes for unified view #}
+  {% set categories = craft.categories()
+    .group('labels')
+    .all() %}
+  {% set recipes = craft.entries()
+    .section('recipes')
+    .all() %}
+
 {% elseif view in categoryMap|keys %}
   {# Query recipes by mapped category (for 3D satellites) #}
   {% set categorySlugs = categoryMap[view] %}
@@ -82,6 +91,12 @@
 {% if view == 'categories' and categories is defined %}
   {% include 'recipes/_modal-categories' with {
     categories: categories,
+    listTitle: listTitle
+  } %}
+{% elseif view == 'hamburger' and categories is defined and recipes is defined %}
+  {% include 'recipes/_modal-hamburger' with {
+    categories: categories,
+    recipes: recipes,
     listTitle: listTitle
   } %}
 {% elseif view == 'search' and recipes is defined %}

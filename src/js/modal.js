@@ -286,10 +286,18 @@ const debouncedSearch = debounce(performSearch, 300);
 // Initialize search input listener
 function initSearchInput() {
   const searchInput = document.getElementById('recipe-search-input');
+  const clearButton = document.getElementById('search-clear-button');
+  const allRecipesSection = document.getElementById('all-recipes-section');
+
   if (!searchInput) return;
 
   searchInput.addEventListener('input', function(e) {
     const query = e.target.value.trim();
+
+    // Toggle clear button visibility
+    if (clearButton) {
+      clearButton.classList.toggle('hidden', !query);
+    }
 
     // Clear results if query is empty
     if (!query) {
@@ -297,12 +305,30 @@ function initSearchInput() {
       if (resultsContainer) {
         resultsContainer.innerHTML = '';
       }
+      // Show all recipes section when search is cleared
+      if (allRecipesSection) {
+        allRecipesSection.classList.remove('hidden');
+      }
       return;
+    }
+
+    // Hide all recipes section when searching
+    if (allRecipesSection) {
+      allRecipesSection.classList.add('hidden');
     }
 
     // Perform debounced search
     debouncedSearch(query);
   });
+
+  // Clear button handler
+  if (clearButton) {
+    clearButton.addEventListener('click', function() {
+      searchInput.value = '';
+      searchInput.dispatchEvent(new Event('input'));
+      searchInput.focus();
+    });
+  }
 
   // Handle Enter key to prevent form submission behavior
   searchInput.addEventListener('keydown', function(e) {
@@ -743,6 +769,12 @@ async function restoreModalFromURL() {
       type: "list",
       view: "categories",
       listTitle: "All Categories",
+    };
+  } else if (cravings === "hamburger") {
+    config = {
+      type: "list",
+      view: "hamburger",
+      listTitle: "Browse Recipes",
     };
   } else {
     // Assume it's a category slug

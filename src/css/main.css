@@ -407,8 +407,7 @@
 /* Recipe Search Styles (BEM) */
 
 .modal-search {
-  margin-top: 2rem;
-  padding-top: 2rem;
+  /* padding-top: 2rem; */
 }
 
 .modal-search__divider {
@@ -428,7 +427,7 @@
 
 .modal-search__input {
   width: 100%;
-  padding: 0.75rem 1rem;
+  padding: 0.75rem 2.5rem 0.75rem 1rem;
   border: 2px solid #a6a6a6;
   border-radius: 8px;
   font-size: 1rem;
@@ -460,7 +459,52 @@
 
 .modal-search__results {
   margin-top: 1rem;
-  min-height: 50px;
+  min-height: 0px;
+}
+
+/* Search Clear Button */
+
+.modal-search__input-wrapper {
+  position: relative;
+}
+
+.modal-search__clear {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 1.75rem;
+  height: 1.75rem;
+  border: none;
+  background: #d0d0d0;
+  border-radius: 50%;
+  font-size: 1.25rem;
+  line-height: 1;
+  color: #666;
+  transition: all 0.2s ease;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-search__clear:hover {
+  background: #b0b0b0;
+  color: #333;
+}
+
+.modal-search__clear:active {
+  background: #a0a0a0;
+}
+
+.modal-search__clear.hidden {
+  display: none;
+}
+
+/* Hamburger Modal Sections */
+
+.hamburger-modal__all-recipes.hidden {
+  display: none;
 }
 
 /* Modal Navigation Buttons */
