@@ -5,22 +5,23 @@
   <h2 class="capitalize text-4xl">{{ listTitle }}</h2>
 
   {# All Categories Section #}
-  {% if categories|length %}
-    <div>
-      <h3 class="text-2xl mb-2">All Categories</h3>
-      <div class="categories-modal__categories flex flex-wrap">
-        {% for category in categories %}
-          <div class="recipe-categories__tag clickable capitalize" data-category-slug="{{ category.slug }}">
-            {{ category.title }}
-          </div>
-        {% endfor %}
+  <div class="bottom-bordered">
+    {% if categories|length %}
+      <div>
+        <h3 class="text-2xl mb-2">All Categories</h3>
+        <div class="categories-modal__categories flex flex-wrap">
+          {% for category in categories %}
+            <div class="recipe-categories__tag clickable capitalize" data-category-slug="{{ category.slug }}">
+              {{ category.title }}
+            </div>
+          {% endfor %}
+        </div>
       </div>
-    </div>
-  {% endif %}
-
+    {% endif %}
+  </div>
+  
   {# Search Section #}
   <div class="modal-search">
-    <div class="modal-search__divider"></div>
     <h3 class="text-2xl mb-2">Search Recipes</h3>
     <div class="modal-search__input-wrapper">
       <input

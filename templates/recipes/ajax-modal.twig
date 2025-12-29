@@ -14,19 +14,7 @@
   'garlicky': 'garlicky'
 } %}
 
-{% if view == 'categories' %}
-  {# Query all categories #}
-  {% set categories = craft.categories()
-    .group('labels')
-    .all() %}
-
-{% elseif view == 'all' %}
-  {# Query all recipes #}
-  {% set recipes = craft.entries()
-    .section('recipes')
-    .all() %}
-
-{% elseif view == 'hamburger' %}
+{% if view == 'hamburger' %}
   {# Query both categories and all recipes for unified view #}
   {% set categories = craft.categories()
     .group('labels')
@@ -88,12 +76,7 @@
 {% endif %}
 
 {# Render modal content based on view type #}
-{% if view == 'categories' and categories is defined %}
-  {% include 'recipes/_modal-categories' with {
-    categories: categories,
-    listTitle: listTitle
-  } %}
-{% elseif view == 'hamburger' and categories is defined and recipes is defined %}
+{% if view == 'hamburger' and categories is defined and recipes is defined %}
   {% include 'recipes/_modal-hamburger' with {
     categories: categories,
     recipes: recipes,

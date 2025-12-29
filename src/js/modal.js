@@ -758,18 +758,6 @@ async function restoreModalFromURL() {
       url: modalConfig.ajaxUrl.replace("/ajax-modal", "/submit"),
       listTitle: "Submit a Recipe",
     };
-  } else if (cravings === "all") {
-    config = {
-      type: "list",
-      view: "all",
-      listTitle: "All Recipes",
-    };
-  } else if (cravings === "categories") {
-    config = {
-      type: "list",
-      view: "categories",
-      listTitle: "All Categories",
-    };
   } else if (cravings === "hamburger") {
     config = {
       type: "list",
