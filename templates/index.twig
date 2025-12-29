@@ -17,10 +17,9 @@
 
 <script type="module">
   import { initAnimation } from '/animation.js?v={{ '/animation.js'|hash }}';
-  import { initModal } from '/modal.js?v={{ '/modal.js'|hash }}';
 
-  // Initialize modal system with AJAX URL
-  initModal({
+  // Initialize modal system with AJAX URL (initModal is loaded via main.js)
+  window.initModal({
     ajaxUrl: '{{ siteUrl('recipes/ajax-modal') }}'
   });
 

@@ -1,9 +1,15 @@
 // Import CSS (Vite will process this)
 import "../css/main.css";
 
-// The existing modal.js and animation.js remain in web/
-// They're loaded via <script type="module"> in the template
-// because they use Three.js from the CDN importmap
+// Import modal functionality
+import { initModal } from "./modal.js";
+
+// Make initModal available globally for the template
+window.initModal = initModal;
+
+// The existing animation.js remains in web/
+// It's loaded via <script type="module"> in the template
+// because it uses Three.js from the CDN importmap
 
 // HMR support for development
 if (import.meta.hot) {
